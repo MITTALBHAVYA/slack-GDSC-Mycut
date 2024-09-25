@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import {UserPreferences} from "../models/userPreferencesModel.js"
 import bcrypt from 'bcrypt';
 import JwtService from '../services/jwtServices.js'; // Import your JWT services
 import { authenticateWithGoogle } from '../services/googleAuthServices.js'; // Google authentication service
@@ -6,7 +7,6 @@ import { catchAsyncErrors } from '../middleware/catchAsyncErrors.js';
 import ErrorHandler from '../middleware/errorHandler.js';
 import EmailService from "../services/EmailService.js";
 import crypto from 'crypto';
-import { Op } from "sequelize";
 import { PasswordReset } from "../models/passwordResetModel.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
@@ -19,11 +19,9 @@ export const register = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler("User already exists with this email", 400));
         }
         const user = await User.create({ username, email, password });
-
+        const user_id = user.id;
+        const userPref = await UserPreferences.create({user_id});
         const token = JwtService.generateToken(user);
-        //console.log("JWT Token generated:", token);
-
-        // Send the JWT token and user data as response
         JwtService.sendToken(user, 201, res, "User registered successfully");
 
     } catch (error) {
@@ -92,8 +90,6 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     if (!user) {
         return next(new ErrorHandler("User not found with this email", 404));
     }
-
-    // Generate reset token
     const {id} = user;
     const resetToken = crypto.randomBytes(20).toString('hex');
     const resetPasswordToken = crypto
@@ -101,10 +97,6 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
         .update(resetToken)
         .digest('hex');
     const resetPasswordExpire = Date.now() + 15 * 60 * 1000;
-
-    // Update user with reset token and expiry
-    // user.resetPasswordToken = resetPasswordToken;
-    // user.resetPasswordExpire = resetPasswordExpire;
     const user_id = id;
     const delPrev = await PasswordReset.deleteMany({user_id});
     const passwordResetData = await PasswordReset.create({ user_id, resetPasswordToken, resetPasswordExpire });
@@ -177,55 +169,3 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
     JwtService.sendToken(user, 200, res, "Password reset successful");
 });
 
-
-export const changePassword = catchAsyncErrors(async (req, res, next) => {
-    const { currentPassword, newPassword } = req.body;
-    const user = await User.findByPk(req.user.id);
-
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-    if (!isPasswordValid) {
-        return next(new ErrorHandler("Current password is incorrect", 401));
-    }
-    try {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(newPassword, salt);
-    } catch (error) {
-        return next(new ErrorHandler("Error hashing password", 500));
-    }
-    await user.save();
-
-    JwtService.sendToken(user, 200, res, "Password changed successfully");
-});
-
-export const updateProfile = catchAsyncErrors(async (req, res, next) => {
-    const { username, email } = req.body;
-    const user = await User.findByPk(req.user.id);
-
-    if (username) user.username = username;
-    if (email) {
-        const emailExists = await User.findOne({ where: { email } });
-        if (emailExists && emailExists.id !== user.id) {
-            return next(new ErrorHandler("Email already in use", 400));
-        }
-        user.email = email;
-    }
-
-    await user.save();
-
-    res.status(200).json({
-        success: true,
-        message: "Profile updated successfully",
-        user: {
-            id: user.id,
-            username: user.username,
-            email: user.email
-        }
-    });
-});
-
-export const getCurrentUser = catchAsyncErrors(async (req, res, next) => {
-    const user = await User.findByPk(req.user.id, {
-        attributes: ['id', 'username', 'email'] 
-    });
-    res.status(200).json({ success: true, user });
-});

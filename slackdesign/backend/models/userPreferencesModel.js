@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment-timezone';
 
 const userPreferencesSchema = new mongoose.Schema({
     user_id : {
@@ -17,7 +18,13 @@ const userPreferencesSchema = new mongoose.Schema({
     timezone : {
         type : String,
         default : 'UTC',
-    }
+        validate : {
+            validator:function(value){
+                return moment.tz.names().includes(value);
+            },
+            message:props=>`${props.value} is not a valid timezone!`
+        },
+    },
 });
 
 export const UserPreferences = mongoose.model("UserPreferences",userPreferencesSchema);

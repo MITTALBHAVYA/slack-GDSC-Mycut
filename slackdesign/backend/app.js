@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 // import { connectPDB } from './config/databases/postgreconn.js';
 import { errorMiddleware } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js'
 // import channelRoutes from './routes/channelRoutes.js';
 // import messageRoutes from './routes/messageRoutes.js';
 // import workspaceRoutes from './routes/workspaceRoutes.js';
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user',userRoutes);
 // app.use('/api/v1/workspace', workspaceRoutes);
 // app.use('/api/v1/channel', channelRoutes);
 // app.use('/api/v1/message', messageRoutes);
