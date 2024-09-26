@@ -12,10 +12,8 @@ import { PasswordReset } from "../models/passwordResetModel.js";
 export const register = catchAsyncErrors(async (req, res, next) => {
     const { username, email, password } = req.body;
 
-    try {
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-            console.log("User already exists");
             return next(new ErrorHandler("User already exists with this email", 400));
         }
         const user = await User.create({ username, email, password });
@@ -23,16 +21,10 @@ export const register = catchAsyncErrors(async (req, res, next) => {
         const userPref = await UserPreferences.create({user_id});
         const token = JwtService.generateToken(user);
         JwtService.sendToken(user, 201, res, "User registered successfully");
-
-    } catch (error) {
-        console.error("Error during registration:", error.message);
-        return next(new ErrorHandler("Error during registration", 500));
-    }
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
     const { email, password } = req.body;
-    try {
         const user = await User.findOne({ where: { email } });
         if (!user) {
             return next(new ErrorHandler("Invalid email or password", 401));
@@ -46,28 +38,18 @@ export const login = catchAsyncErrors(async (req, res, next) => {
         const token = JwtService.generateToken(user);
 
         JwtService.sendToken(user, 200, res, "Login successful");
-    } catch (err) {
-        console.error("Error during login:", err.message);
-        return next(new ErrorHandler("Error during login", 500));
-    }
 });
 
 // Google Login
 export const googleLogin = catchAsyncErrors(async (req, res, next) => {
     const { token } = req.body;
 
-    try {
         const { user, token: jwtToken } = await authenticateWithGoogle(token);
 
         if (!user) {
             return next(new ErrorHandler("Google authentication failed", 400));
         }
         JwtService.sendToken(user, 200, res, "Google login successful");
-
-    } catch (error) {
-        console.error("Error during Google login:", error.message);
-        return next(new ErrorHandler("Error during Google authentication", 500));
-    }
 });
 
 export const logout = catchAsyncErrors(async (req, res, next) => {
@@ -76,6 +58,7 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
         .cookie("token", "", {
             expires: new Date(Date.now()),
             httpOnly: true,
+            sameSite: 'Strict',
         })
         .json({
             success: true,
@@ -100,7 +83,6 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     const user_id = id;
     const delPrev = await PasswordReset.deleteMany({user_id});
     const passwordResetData = await PasswordReset.create({ user_id, resetPasswordToken, resetPasswordExpire });
-    console.log(passwordResetData);
     const emailSubject = `Password Reset Request`;
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     const emailMessage = `You requested a password reset. Click here to reset your password: ${resetUrl}\n\n If you did not request this, please ignore this email.`;

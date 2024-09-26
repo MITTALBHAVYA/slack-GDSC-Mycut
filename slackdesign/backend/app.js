@@ -10,7 +10,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js'
 // import channelRoutes from './routes/channelRoutes.js';
 // import messageRoutes from './routes/messageRoutes.js';
-// import workspaceRoutes from './routes/workspaceRoutes.js';
+import workspaceRoutes from './routes/workspaceRoutes.js';
 import './models/index.js';
 
 dotenv.config();
@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user',userRoutes);
-// app.use('/api/v1/workspace', workspaceRoutes);
+app.use('/api/v1/workspace', workspaceRoutes);
 // app.use('/api/v1/channel', channelRoutes);
 // app.use('/api/v1/message', messageRoutes);
 
