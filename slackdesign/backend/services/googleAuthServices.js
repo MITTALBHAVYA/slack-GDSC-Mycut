@@ -32,30 +32,24 @@ const verifyGoogleToken = async (googleToken) => {
  */
 const authenticateWithGoogle = async (googleToken, res) => {
     const { email, name, sub: googleId } = await verifyGoogleToken(googleToken);
-
-    // Check if user already exists
     let user = await User.findOne({ where: { email } });
 
     if (!user) {
-        // Handle unique username
         let username = name;
         let existingUser = await User.findOne({ where: { username } });
 
         while (existingUser) {
-            username = `${name}${Math.floor(Math.random() * 10000)}`; // Generate a unique username
+            username = `${name}${Math.floor(Math.random() * 10000)}`;
             existingUser = await User.findOne({ where: { username } });
         }
-
-        // Create a new user if not exists
         user = await User.create({
             email,
             username,
             google_auth_id: googleId,
-            password: null, // Setting password to null for Google-authenticated users
+            password: null,
         });
     }
 
-    // Use JwtService to generate JWT and send it as a response
     JwtService.sendToken(user, 200, res, 'Google authentication successful');
 };
 

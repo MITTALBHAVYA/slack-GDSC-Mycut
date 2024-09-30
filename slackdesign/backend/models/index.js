@@ -1,21 +1,21 @@
-// models/index.js
 import postgresConnection from '../config/databases/postgreconn.js';
 import User from './userModel.js';
 import Workspace from './workspaceModel.js';
 import Channel from './channelModel.js';
 import UserChannelRelation from './userChannelRelationModel.js';
 
-// Define relationships
 User.hasMany(Workspace, { foreignKey: 'owner_id' });
 Workspace.belongsTo(User, { foreignKey: 'owner_id' });
 
 Workspace.hasMany(Channel, { foreignKey: 'workspace_id' });
 Channel.belongsTo(Workspace, { foreignKey: 'workspace_id' });
 
-User.belongsToMany(Channel, { through: UserChannelRelation, foreignKey: 'user_id' });
-Channel.belongsToMany(User, { through: UserChannelRelation, foreignKey: 'channel_id' });
+User.belongsToMany(Channel, { through: UserChannelRelation, foreignKey: 'user_id',as:'UserChannels' });
+Channel.belongsToMany(User, { through: UserChannelRelation, foreignKey: 'channel_id',as:'ChannelUsers' });
 
-// Sync models in the correct order
+UserChannelRelation.belongsTo(User,{foreignKey:'user_id'});
+UserChannelRelation.belongsTo(Channel,{foreignKey:'channel_id'});
+
 const syncModels = async () => {
   try {
     await postgresConnection.sync({ alter: true }); // Sync all models

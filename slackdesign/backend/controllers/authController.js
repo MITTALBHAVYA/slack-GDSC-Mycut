@@ -1,8 +1,8 @@
 import User from "../models/userModel.js";
 import {UserPreferences} from "../models/userPreferencesModel.js"
 import bcrypt from 'bcrypt';
-import JwtService from '../services/jwtServices.js'; // Import your JWT services
-import { authenticateWithGoogle } from '../services/googleAuthServices.js'; // Google authentication service
+import JwtService from '../services/jwtServices.js';
+import { authenticateWithGoogle } from '../services/googleAuthServices.js';
 import { catchAsyncErrors } from '../middleware/catchAsyncErrors.js';
 import ErrorHandler from '../middleware/errorHandler.js';
 import EmailService from "../services/EmailService.js";
@@ -40,7 +40,6 @@ export const login = catchAsyncErrors(async (req, res, next) => {
         JwtService.sendToken(user, 200, res, "Login successful");
 });
 
-// Google Login
 export const googleLogin = catchAsyncErrors(async (req, res, next) => {
     const { token } = req.body;
 
@@ -150,4 +149,3 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     JwtService.sendToken(user, 200, res, "Password reset successful");
 });
-

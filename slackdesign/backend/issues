@@ -1,0 +1,5 @@
+can't create channel with same name in different workspace
+
+http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/1c70ae4a-f48d-450f-b010-e5fa4dc5769d/
+
+http://localhost:3000/api/v1/workspace/52fc6031-cf70-43a0-a6c9-6645aa9df116/channel/d9fd3b3b-afc3-49d4-8e5a-58ec168ec7f1

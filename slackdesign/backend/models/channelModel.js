@@ -34,8 +34,4 @@ const Channel = postgresConnection.define('Channel', {
   updatedAt:false,
 });
 
-// Channel.sync().then(() => {
-//     console.log('Channel Model synced');
-// });
-
 export default Channel;

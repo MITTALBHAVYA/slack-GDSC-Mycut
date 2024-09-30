@@ -113,4 +113,4 @@ export const changeUserPreferences = catchAsyncErrors(async (req, res, next) => 
         preferences:userPreferences
     })
 }
-)
+);

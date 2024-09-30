@@ -32,8 +32,4 @@ const UserChannelRelation = postgresConnection.define('UserChannelRelation', {
   timestamps:false,
 });
 
-// UserChannelRelation.sync().then(() => {
-//     console.log('UserChannelRelation Model synced');
-// });
-
 export default UserChannelRelation;

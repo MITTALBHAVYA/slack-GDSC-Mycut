@@ -2,7 +2,6 @@ import express from "express";
 import { register, login, googleLogin, logout, forgotPassword, resetPassword} from "../controllers/authController.js";
 import { rateLimiter } from "../middleware/rateLimiter.js";
 
-
 const router = express.Router();
 
 router.post("/register", register);

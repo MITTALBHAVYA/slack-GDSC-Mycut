@@ -1,7 +1,8 @@
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
 import ErrorHandler from "../middleware/errorHandler.js";
-// import User from "../models/userModel.js";
 import Workspace from "../models/workspaceModel.js";
+import Channel from "../models/channelModel.js";
+import UserChannelRelation from "../models/userChannelRelationModel.js";
 import { Op } from "sequelize";
 
 export const createWorkspace = catchAsyncErrors(async (req, res, next) => {
@@ -27,17 +28,19 @@ export const createWorkspace = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-
 export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
     const owner_id = req.user.id;
     
     const workspaces = await Workspace.findAll({ where: { owner_id } });
 
     if (!workspaces || workspaces.length === 0) {
-        return next(new ErrorHandler("No workspaces found for this user", 404));
+        return res.status(200).json({
+            success: true,
+            message: "No workspaces found for this user",
+            workspaces: []
+        });
     }
 
-    // console.log(workspaces);
     res.status(200).json({
         success: true,
         message: "All workspaces gathered successfully",
@@ -46,28 +49,21 @@ export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const updateWorkspace = catchAsyncErrors(async (req, res, next) => {
-    const { id } = req.params;
     const { name } = req.body;
-    const owner_id = req.user.id;
+    const workspaceId = req.workspace.id;
+    const owner_id = req.workspace.owner_id;
+    
+    const workspace = await Workspace.findOne({ where: { id:workspaceId, owner_id } });
 
-    // Check if workspace with the provided id exists and belongs to the user
-    const workspace = await Workspace.findOne({ where: { id, owner_id } });
-
-    if (!workspace) {
-        return next(new ErrorHandler("Workspace not found or you're not authorized to update it", 404));
-    }
-
-    // Validate the new workspace name
     if (!name || name.length < 3 || name.length > 50) {
         return next(new ErrorHandler("Workspace name must be between 3 and 50 characters", 400));
     }
 
-    // Check if the new name already exists for this user
     const existingWorkspace = await Workspace.findOne({
         where: {
             owner_id,
             name,
-            id: { [Op.ne]: id }, 
+            id: { [Op.ne]: workspaceId }, 
         },
     });
 
@@ -86,21 +82,18 @@ export const updateWorkspace = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const deleteWorkspace = catchAsyncErrors(async (req, res, next) => {
-    const { id } = req.params;
-    const owner_id = req.user.id;
+    const workspaceId = req.workspace.id;
+    const owner_id = req.workspace.owner_id;
 
-    // Check if the workspace exists and belongs to the user
-    const workspace = await Workspace.findOne({ where: { id, owner_id } });
+    const channels = await Channel.findAll({ where: { workspace_id: workspaceId } });
 
-    if (!workspace) {
-        return next(new ErrorHandler("Workspace not found or you're not authorized to delete it", 404));
-    }
+    await UserChannelRelation.destroy({ where: { channel_id: channels.map(channel => channel.id) } });
 
-    // Delete the workspace
-    await workspace.destroy();
+    await Channel.destroy({ where: { workspace_id: workspaceId} });
+    await req.workspace.destroy();
 
     res.status(200).json({
         success: true,
-        message: "Workspace deleted successfully"
+        message: "Workspace and all associated channels deleted successfully",
     });
 });

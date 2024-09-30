@@ -1,4 +1,4 @@
-import { DataTypes, Op } from 'sequelize'; // Import Op
+import { DataTypes, Op } from 'sequelize';
 import postgresConnection from '../config/databases/postgreconn.js';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
@@ -45,7 +45,7 @@ const User = postgresConnection.define('User', {
 });
 
 User.beforeCreate(async (user) => {
-    if (user.password) { // Only hash if password exists
+    if (user.password) {
         try {
             const salt = await bcrypt.genSalt(10);
             user.password = await bcrypt.hash(user.password, salt);

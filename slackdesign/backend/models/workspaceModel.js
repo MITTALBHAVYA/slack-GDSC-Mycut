@@ -33,8 +33,4 @@ const Workspace = postgresConnection.define('Workspace', {
   updatedAt:false,
 });
 
-// Workspace.sync().then(() => {
-//   console.log('Workspace Model synced');
-// });
-
 export default Workspace;

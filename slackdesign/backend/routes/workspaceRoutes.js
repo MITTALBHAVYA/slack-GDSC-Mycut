@@ -1,15 +1,13 @@
 import express from "express";
 import {createWorkspace, getAllWorkspaces,updateWorkspace,deleteWorkspace} from "../controllers/workspaceController.js"
 import { isAuthorized } from "../middleware/authMiddleware.js";
+import { isWorkspaceOwner } from "../middleware/workspaceOwner.js";
 
-const router = express.Router();
-
+const router = express.Router({mergeParams: true});
 
 router.post("/",isAuthorized,createWorkspace);
-
 router.get("/",isAuthorized,getAllWorkspaces);
+router.put("/:workspaceId",isAuthorized,isWorkspaceOwner,updateWorkspace);
+router.delete("/:workspaceId",isAuthorized,isWorkspaceOwner,deleteWorkspace);
 
-router.put("/:id",isAuthorized,updateWorkspace);
-
-router.delete("/:id",isAuthorized,deleteWorkspace);
 export default router;
