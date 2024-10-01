@@ -1,0 +1,25 @@
+/* src/styles.css */
+
+.upper-left-vector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 32%;
+    height: 315px;
+    background: url("/public/images/Vector2.png") no-repeat;
+    background-size: contain;
+    background-position: top left;
+    z-index: 1; /* Set a value higher than the z-index of other elements */
+  }
+  
+  .upper-right-vector {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30%;
+    height: 310px;
+    background: url("/public/images/Vector3.png") no-repeat;
+    background-size: contain;
+    background-position: top right;
+    z-index: 1; /* Set a value higher than the z-index of other elements */
+  }

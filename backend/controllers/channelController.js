@@ -216,9 +216,6 @@ export const removeMembersFromChannel = catchAsyncErrors(async (req, res, next) 
             message: "Channel not found."
         });
     }
-
-    console.log(channel);
-
     const ownerId = channel.Workspace.owner_id;
 
     if (userIds.includes(ownerId)) {

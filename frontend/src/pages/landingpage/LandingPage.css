@@ -1,0 +1,200 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0);
+    padding: 15px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    width: 85vw;
+    margin: 0 auto;
+  }
+  .logo a{
+    color: #FFFFFF;
+    font-size: 2em;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    margin-top: 0.5vw;
+    text-decoration: none;
+    font-family: 'Quicksand';
+    margin-left: 1rem;
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+  .links a {
+    color: white;
+    font-family: 'Inter';
+    text-decoration: none;
+    margin-right: 20px;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+  }
+  .landing-nav-func{
+    display: flex;
+    align-items: center;
+    align-content: center;
+  }
+  .landing-nav-func img {
+    width: 2vw;
+    height: 2vw;
+    flex-shrink: 0;
+    margin-top: 1.4vw;
+    margin-right: 1vw;
+    align-items: center;
+    cursor: pointer;
+}
+.links {
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-top: 0.4vw;
+    margin-right: 3vw;
+}
+.links a{
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+.explore-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.explore-button button {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  width: 12vw; 
+  height: 4vw;
+  text-align: center;
+  font-size: 1.5vw; 
+  line-height: 2;
+  margin: 0;
+}
+
+.explore-button button:hover {
+  background-color: #3498db;
+  color: #ffffff;
+}
+
+  .content {
+    position: relative;
+    top: 1vw;
+    font-size: 1.2em;
+  }
+  
+  .right-side-area {
+    display: flex;
+    flex-direction: column;
+    margin-left: 42%;
+    margin-bottom: 14%;
+    margin-right: 7%;
+    margin-top: 6%;
+    z-index: 3;
+    padding-top: 0%;
+  }
+  .WhiteText,
+  .YelloText{
+    font-family: 'Inter';
+    font-weight: bold;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  }
+  .WhiteText{ 
+    color: #FFFFFF;
+    margin-top: -8%;
+    margin-bottom: 1%;
+  }
+  .YelloText{
+    color: #FFB409;
+    margin-top: 0%;
+    margin-bottom: 8%;
+  }
+  .connect{
+    font-family: 'Quicksand';
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+    letter-spacing: 0.06em;
+  }
+  .content {
+    max-width: 600px;
+    margin-top: 0;
+  }
+  
+ .signup_btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 2vw;
+}
+
+.email_signup_btn,
+.ggl_signup_btn {
+  overflow: hidden; 
+  white-space: nowrap;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  width: 20vw;
+  height: 4.5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center; 
+  border-radius: 0.25em;
+}
+.ggl_signup_btn:hover {
+  background-color: #3498db; 
+  color: #ffffff;
+}
+.email_signup_btn:hover{
+  background-color: #d85bb5;
+  color: wheat;
+}
+.email_signup_btn {
+  background-color: #FFFFFF;
+  color: #31304D; ;
+}
+
+.email_signup_btn span,
+.ggl_signup_btn span{
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  font-family: 'Inter';
+  font-size: 1.25vw;
+}
+.ggl_signup_btn {
+  background-color: #FFB409;
+  color: black; 
+}
+
+.ggl_signup_btn img {
+  margin-left: 0.5vw;
+  height: 2.5vw;
+  width: 2.5vw;
+  border-radius: 0.3vw;
+}
+  .bottom-text {
+    text-align: center;
+    margin-top: -7%;
+    z-index: 3; /* Adjust as needed */
+  }
+  
+  .center-text {
+    font-family: 'Quicksand';
+    font-size: 1.5em; /* Adjust as needed */
+    color: #FFFFFF;
+    font-weight: bold;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.07rem;
+     /* Adjust as needed */
+  }
