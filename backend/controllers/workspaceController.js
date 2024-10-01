@@ -3,7 +3,7 @@ import ErrorHandler from "../middleware/errorHandler.js";
 import Workspace from "../models/workspaceModel.js";
 import Channel from "../models/channelModel.js";
 import UserChannelRelation from "../models/userChannelRelationModel.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 
 export const createWorkspace = catchAsyncErrors(async (req, res, next) => {
     const owner_id = req.user.id;
@@ -28,7 +28,7 @@ export const createWorkspace = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
-export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
+export const getAllWorkspaces2 = catchAsyncErrors(async (req, res, next) => {
     const owner_id = req.user.id;
     
     const workspaces = await Workspace.findAll({ where: { owner_id } });
@@ -45,6 +45,43 @@ export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
         success: true,
         message: "All workspaces gathered successfully",
         workspaces : workspaces
+    });
+});
+
+export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user.id;
+
+    const workspaces = await Workspace.findAll({
+        where: {
+            [Op.or]: [
+                { owner_id: userId }, 
+                {
+                    id: {
+                        [Op.in]: Sequelize.literal(`(
+                             SELECT w.id FROM public."Workspaces" w 
+                             INNER JOIN public."Channels" c ON w.id = c.workspace_id
+                             INNER JOIN public."UserChannelRelations" ucr ON ucr.channel_id = c.id
+                             WHERE ucr.user_id = '${userId}'
+                        )`) 
+                    }
+                }
+            ]
+        },
+        group:['Workspace.id'],
+    });
+
+    if (!workspaces || workspaces.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "No workspaces found for this user",
+            workspaces: []
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "All workspaces gathered successfully",
+        workspaces: workspaces
     });
 });
 
