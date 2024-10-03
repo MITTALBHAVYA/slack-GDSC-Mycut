@@ -5,7 +5,7 @@ import UserChannelRelation from "../models/userChannelRelationModel.js";
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
 import ErrorHandler from "../middleware/errorHandler.js";
 import User from "../models/userModel.js";
-
+import { Op } from "sequelize";
 
 export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
     const {workspaceId,channelId} = req.params;
@@ -14,7 +14,7 @@ export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
     const channel = await Channel.findOne({
         where : {
             id:channelId,
-            workspace_id:workspaceId
+            workspace_id:workspaceId,
         }
     })
 
@@ -24,12 +24,14 @@ export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
 
     const users = await User.findAll({
         where:{
-            email : emails
-        }
+            email : {
+                [Op.in]:emails,
+            }
+        },
+        attributes:['id','email','username'],
     });
-
-    const foundEmails = users.map(user => users.email);
-    const invalidEmails = emails.filter(email=>!foundEmails.includes(email));
+    const foundEmails = users.map(user => user.email);
+    const invalidEmails = emails.filter(email => !foundEmails.includes(email));
 
     if(invalidEmails.length>0){
         return res.status(404).json({
