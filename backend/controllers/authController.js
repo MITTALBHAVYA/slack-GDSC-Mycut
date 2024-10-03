@@ -1,3 +1,4 @@
+//authController.js
 import User from "../models/userModel.js";
 import {UserPreferences} from "../models/userPreferencesModel.js"
 import bcrypt from 'bcrypt';

@@ -1,3 +1,4 @@
+//workspaceController.js
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
 import ErrorHandler from "../middleware/errorHandler.js";
 import Workspace from "../models/workspaceModel.js";

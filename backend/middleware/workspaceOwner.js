@@ -1,3 +1,4 @@
+//workspaceOwner.js
 import Workspace from "../models/workspaceModel.js";
 import { catchAsyncErrors } from "./catchAsyncErrors.js";
 import ErrorHandler from "./errorHandler.js";

@@ -1,3 +1,5 @@
+//authRoutes.js
+
 import express from "express";
 import { register, login, googleLogin, logout, forgotPassword, resetPassword} from "../controllers/authController.js";
 import { rateLimiter } from "../middleware/rateLimiter.js";

@@ -1,3 +1,4 @@
+//userModel.js
 import { DataTypes, Op } from 'sequelize';
 import postgresConnection from '../config/databases/postgreconn.js';
 import bcrypt from 'bcrypt';

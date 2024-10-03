@@ -1,3 +1,5 @@
+//jwtServices.js
+
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import { jwtConfig } from '../config/jwtConfig.js';

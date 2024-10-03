@@ -1,3 +1,4 @@
+//rateLimiter.js
 import rateLimit from "express-rate-limit";
 
 export const rateLimiter = (minutes,maxRequests)=>{

@@ -1,3 +1,4 @@
+//channelModel.js
 import { DataTypes } from 'sequelize';
 import postgresConnection from '../config/databases/postgreconn.js';
 import Workspace from './workspaceModel.js';

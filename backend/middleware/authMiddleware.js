@@ -1,3 +1,4 @@
+//authMiddleWare.js
 import { catchAsyncErrors } from "./catchAsyncErrors.js";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";

@@ -1,3 +1,4 @@
+//channelController.js
 import Channel from "../models/channelModel.js";
 import Workspace from "../models/workspaceModel.js";
 import UserChannelRelation from "../models/userChannelRelationModel.js";

@@ -1,3 +1,5 @@
+//userRoutes.js
+
 import express from "express";
 import {changePassword, updateProfile, getCurrentUser, getCurrUserPref, deleteCurrUser, changeUserPreferences} from "../controllers/userController.js"
 import { isAuthorized } from "../middleware/authMiddleware.js";

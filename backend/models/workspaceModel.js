@@ -1,3 +1,5 @@
+//workspaceModel.js
+
 import { DataTypes } from 'sequelize';
 import postgresConnection from '../config/databases/postgreconn.js';
 import User from './userModel.js';

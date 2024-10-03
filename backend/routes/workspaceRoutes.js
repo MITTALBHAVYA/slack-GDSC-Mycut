@@ -1,3 +1,4 @@
+//workspaceRoutes.js
 import express from "express";
 import {createWorkspace, getAllWorkspaces,updateWorkspace,deleteWorkspace, getAllWorkspaces2} from "../controllers/workspaceController.js"
 import { isAuthorized } from "../middleware/authMiddleware.js";

@@ -1,3 +1,4 @@
+//index.js
 import postgresConnection from '../config/databases/postgreconn.js';
 import User from './userModel.js';
 import Workspace from './workspaceModel.js';

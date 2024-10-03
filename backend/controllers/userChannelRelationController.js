@@ -1,3 +1,4 @@
+//userChannelRelationController.js
 import Channel from "../models/channelModel.js";
 import Workspace from "../models/workspaceModel.js";
 import UserChannelRelation from "../models/userChannelRelationModel.js";
@@ -8,7 +9,7 @@ import User from "../models/userModel.js";
 
 export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
     const {workspaceId,channelId} = req.params;
-    const {userIds} = req.body;
+    const {emails} = req.body;
 
     const channel = await Channel.findOne({
         where : {
@@ -21,18 +22,37 @@ export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
         return next(new ErrorHandler("Channel not found",404));
     }
 
-    for(const userId of userIds){
-        await UserChannelRelation.create({
-            user_id:userId,
-            channel_id:channelId,
-            role:'member'
+    const users = await User.findAll({
+        where:{
+            email : emails
+        }
+    });
+
+    const foundEmails = users.map(user => users.email);
+    const invalidEmails = emails.filter(email=>!foundEmails.includes(email));
+
+    if(invalidEmails.length>0){
+        return res.status(404).json({
+            success:false,
+            message:"Some users not found with the given emails",
+            invalidEmails:invalidEmails
         });
     }
+
+    const userChannelRelations = users.map(user=>({
+        user_id:user.id,
+        channel_id:channelId,
+        role:'member'
+    }));
+
+    await UserChannelRelation.bulkCreate(userChannelRelations);
 
     res.status(200).json({
         success:true,
         message:"Members added to the channel successfully",
-    });
+        addedMembers : foundEmails
+    })
+    
 });
 
 export const getAllMembersInChannel = catchAsyncErrors(async (req, res, next) => {
