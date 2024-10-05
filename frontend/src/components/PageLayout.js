@@ -1,5 +1,5 @@
+// PageLayout.js
 import React from 'react';
-
 const PageLayout = ({ children }) => {
   return (
     <div style={pageStyle}>
@@ -7,7 +7,6 @@ const PageLayout = ({ children }) => {
     </div>
   );
 };
-
 const pageStyle = {
   background:`url("images/space1.jpg")`,
   backgroundSize: 'cover',

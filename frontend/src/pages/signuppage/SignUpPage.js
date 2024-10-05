@@ -1,3 +1,4 @@
+// SignUpPage.jss
 import React, { useState } from 'react';
 import PageLayout from '../../components/PageLayout';
 import { Link } from 'react-router-dom';

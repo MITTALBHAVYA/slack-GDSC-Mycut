@@ -17,7 +17,7 @@ export const checkUserRole = (...acceptedRoles)=>{
         });
 
         if(!userChannelRelation){
-            return next(new ErrorHandler("USer is not associated with this channel",403));
+            return next(new ErrorHandler("User is not associated with this channel",403));
         }
 
         const userRole = userChannelRelation.role;

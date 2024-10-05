@@ -8,7 +8,7 @@ import { errorMiddleware } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js'
 import channelRoutes from './routes/channelRoutes.js';
-// import messageRoutes from './routes/messageRoutes.js';
+import messageRoutes from "./routes/messageRoutes.js";
 import userChannelRelationRoutes from './routes/userChannelRelationRoutes.js'
 import workspaceRoutes from './routes/workspaceRoutes.js';
 import './models/index.js';
@@ -34,7 +34,7 @@ app.use('/api/v1/user',userRoutes);
 app.use('/api/v1/workspace', workspaceRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel', channelRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel/:channelId',userChannelRelationRoutes);
-// app.use('/api/v1/message', messageRoutes);
+app.use('/api/v1/workspace/:workspaceId/channel/:channelId/messages', messageRoutes);
 
 // connectMDB();
 // connectPDB();

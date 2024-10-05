@@ -6,8 +6,8 @@ import { rateLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register",rateLimiter(15,20), register);
+router.post("/login",rateLimiter(15,20), login);
 router.post("/google", googleLogin);
 router.post("/logout", logout);
 router.post("/forgot-password", rateLimiter(15,5),forgotPassword);

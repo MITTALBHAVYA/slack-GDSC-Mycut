@@ -1,3 +1,4 @@
+// LandingPage.js
 import React from 'react';
 import PageLayout from '../../components/PageLayout';
 import { Link } from 'react-router-dom';

@@ -1,3 +1,4 @@
+// SpaceRobot.js
 import React, { useState, useEffect } from 'react';
 import './SpaceRobot.css';
 import FloatingRobotImage from '../SpaceRobot/FloatingRobot.png';
