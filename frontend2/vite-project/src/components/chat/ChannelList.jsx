@@ -1,5 +1,5 @@
 // ChannelList.jsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChannels, setCurrentChannel } from '../../features/channelSlice.js';
 
@@ -7,6 +7,7 @@ const ChannelList = () => {
   const dispatch = useDispatch();
   const { channels, currentChannel, isLoading } = useSelector((state) => state.channel);
   const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+  const [localChannels, setLocalChannels] = useState([]);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -14,14 +15,18 @@ const ChannelList = () => {
     }
   }, [currentWorkspace, dispatch]);
 
+  useEffect(()=>{
+    if(channels && channels.channels && channels.channels[0]){
+      setLocalChannels(channels.channels[0]);
+    }
+  },[channels]);
+
   const handleChannelClick = (channel) => {
     dispatch(setCurrentChannel(channel));
   };
 
   if (!currentWorkspace) return <div>Select a workspace</div>;
   if (isLoading) return <div>Loading channels...</div>;
-  console.log('channels',channels);
-  const channelArray = channels.channels[0] || [];
   return (
     <div className="bg-gray-700 w-64 flex-shrink-0">
       <div className="px-4 py-2 border-b border-gray-600">
@@ -29,10 +34,10 @@ const ChannelList = () => {
       </div>
       <div className="px-2 py-2">
         <h3 className="text-gray-400 text-sm mb-2">Channels</h3>
-        {channels.length === 0 ? (
+        {localChannels.length === 0 ? (
           <div className="text-gray-400">No channels available</div>
         ) : (
-          channelArray.map((channel) => (
+          localChannels.map((channel) => (
             <button
               key={channel.id}
               onClick={() => handleChannelClick(channel)}
