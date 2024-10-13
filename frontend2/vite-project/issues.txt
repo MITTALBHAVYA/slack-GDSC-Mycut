@@ -1,0 +1,1465 @@
+frontend2
+|-node_modules
+|-public
+|-src
+| |-api
+| | |-axios.js
+| |-app
+| | |-store.js
+| |-assets
+| | |-react.svg
+| |-components
+| | |-auth
+| | | |-ForgotPassword.jsx
+| | | |-Login.jsx
+| | | |-PrivateRoute.jsx
+| | | |-Register.jsx
+| | |-chat
+| | | |-ChannelList.jsx
+| | | |-MessageInput.jsx
+| | | |-MessageList.jsx
+| | | |-UserList.jsx
+| | |-layout
+| | | |-ChatLayout.jsx
+| | | |-Header.jsx
+| | | |-Sidebar.jsx
+| | |-workspace
+| | | |-CreateWorkspace.jsx
+| | | |-WorkspaceList.jsx
+| | |-features
+| | | |-authSlice.js
+| | | |-channelSlice.js
+| | | |-messageSlice.js
+| | | |-workspaceSlice.js
+| | |-hooks
+| | | |-useSocket.js
+| | |-pages
+| | | |-AuthPage.jsx
+| | | |-ChatPage.jsx
+| | | |-NotFound.jsx
+| | | |-WorkspacePage.jsx
+| | |-App.jsx
+| | |-main.jsx
+
+// axios.js
+import axios from 'axios';
+const api = axios.create({
+    baseURL:'http://localhost:3000/api/v1',
+    withCredentials:true,
+});
+api.interceptors.request.use(
+    (config)=>{
+        const token = localStorage.getItem('token');
+        if(token){
+            config.headers.Authorization=`Bearer ${token}`;
+        }
+        return config;
+    },
+    (error)=>{
+        return Promise.reject(error);
+    }
+);
+api.interceptors.response.use(
+    (response)=>response,
+    async(error)=>{
+        if(error.response.status === 401){
+            localStorage.removeItem('token');
+            window.location.href='/login';
+        }
+        return Promise.reject(error);
+    }
+);
+export default api;
+// store.js
+import {configureStore} from '@reduxjs/toolkit';
+import authReducer from '../features/authSlice.js';
+import channelReducer from '../features/channelSlice.js';
+import messageReducer from '../features/messageSlice.js';
+import workspaceReducer from '../features/workspaceSlice.js';
+export const store = configureStore({
+    reducer:{
+        auth : authReducer,
+        channel:channelReducer,
+        message:messageReducer,
+        workspace:workspaceReducer,
+    },
+});
+export default store;
+// ForgotPassword.jsx
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { forgotPassword } from '../../features/authSlice.js';
+import { Link } from 'react-router-dom';
+
+const ForgotPassword = () => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await dispatch(forgotPassword({ email })).unwrap();
+      setStatus({
+        type: 'success',
+        message: 'Password reset link has been sent to your email',
+      });
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || 'Failed to send reset link';
+      setStatus({
+        type: 'error',
+        message: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Reset your password
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Enter your email address and we&apos;ll send you a link to reset your password.
+          </p>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="sr-only">
+              Email address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          {status.message && (
+            <div
+              className={`text-sm text-center ${
+                status.type === 'success' ? 'text-green-600' : 'text-red-600'
+              }`}
+              aria-live="polite"
+            >
+              {status.message}
+            </div>
+          )}
+
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {isLoading ? 'Sending...' : 'Send reset link'}
+            </button>
+          </div>
+        </form>
+
+        <div className="text-center">
+          <Link
+            to="/login"
+            className="font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Back to login
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ForgotPassword;
+// Login.jsx
+import {useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {login} from '../../features/authSlice.js';
+import {Link, useNavigate} from 'react-router-dom';
+
+const Login = () =>{
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {isLoading,error} = useSelector((state)=>state.auth);
+
+    const handleSubmit = async(e)=>{
+        e.preventDefault();
+        const result = await dispatch(login({email, password}));
+        if(!result.error){
+            navigate('/workspace');
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
+            <div>
+              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Sign in to your account
+              </h2>
+            </div>
+            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+              <div className="rounded-md shadow-sm -space-y-px">
+                <div>
+                  <label htmlFor="email-address" className="sr-only">
+                    Email address
+                  </label>
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    required
+                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="Email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="sr-only">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+    
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
+    
+              <div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  {isLoading ? 'Signing in...' : 'Sign in'}
+                </button>
+              </div>
+            </form>
+    
+            <div className="text-center">
+              <Link
+                to="/register"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                Don&apos;t have an account? Sign up
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+};
+
+export default Login;
+// PrivateRoute.jsx
+import PropTypes from 'prop-types';
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+
+const PrivateRoute = ({ children }) => {
+  const { token } = useSelector((state) => state.auth);
+
+  return token ? children : <Navigate to="/auth/login" replace />;
+};
+
+// Define prop types
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired, 
+};
+
+export default PrivateRoute;
+// Register.jsx
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../../features/authSlice.js';
+import { Link, useNavigate } from 'react-router-dom';
+
+const Register = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [errors, setErrors] = useState({});
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error } = useSelector((state) => state.auth);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.username) newErrors.username = 'Username is required';
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      const { confirmPassword, ...registrationData } = formData;
+      let k = confirmPassword;
+      let result=k;
+      result = await dispatch(register(registrationData));
+      if (!result.error) {
+        navigate('/workspaces');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Create your account
+          </h2>
+        </div>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="username" className="sr-only">
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Username"
+                value={formData.username}
+                onChange={handleChange}
+              />
+              {errors.username && (
+                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email address"
+                value={formData.email}
+                onChange={handleChange}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="sr-only">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+              )}
+            </div>
+          </div>
+
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {isLoading ? 'Creating account...' : 'Create account'}
+            </button>
+          </div>
+        </form>
+
+        <div className="text-center">
+          <Link
+            to="/login"
+            className="font-medium text-indigo-600 hover:text-indigo-500"
+          >
+            Already have an account? Sign in
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
+// ChannelList.jsx
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchChannels, setCurrentChannel } from '../../features/channelSlice.js';
+
+const ChannelList = () => {
+  const dispatch = useDispatch();
+  const { channels, currentChannel, isLoading } = useSelector((state) => state.channel);
+  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+
+  useEffect(() => {
+    if (currentWorkspace) {
+      dispatch(fetchChannels(currentWorkspace.id));
+    }
+  }, [currentWorkspace, dispatch]);
+
+  const handleChannelClick = (channel) => {
+    dispatch(setCurrentChannel(channel));
+  };
+
+  if (!currentWorkspace) return <div>Select a workspace</div>;
+  if (isLoading) return <div>Loading channels...</div>;
+  const channelArray = channels?.channels[0] || [];
+  return (
+    <div className="bg-gray-700 w-64 flex-shrink-0">
+      <div className="px-4 py-2 border-b border-gray-600">
+        <h2 className="text-white font-semibold">{currentWorkspace.name}</h2>
+      </div>
+      <div className="px-2 py-2">
+        <h3 className="text-gray-400 text-sm mb-2">Channels</h3>
+        {channels.length === 0 ? (
+          <div className="text-gray-400">No channels available</div>
+        ) : (
+          channelArray.map((channel) => (
+            <button
+              key={channel.id}
+              onClick={() => handleChannelClick(channel)}
+              className={`w-full text-left px-2 py-1 rounded ${
+                currentChannel?.id === channel.id
+                  ? 'bg-indigo-500 text-white'
+                  : 'text-gray-300 hover:bg-gray-600'
+              }`}
+            >
+              # {channel.name}
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ChannelList;
+// MessageInput.jsx
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import useSocket from '../../hooks/useSocket.js';
+
+const MessageInput = ({ channelId }) => {
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { sendMessage } = useSocket();
+  const userId = useSelector((state) => state.auth.user?.id);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    setIsLoading(true);
+    try {
+      sendMessage({
+        channelId,
+        message: message.trim(),
+        userId,
+      });
+      setMessage('');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center p-4 border-t">
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type a message..."
+        className="flex-grow px-4 py-2 border rounded-l focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        disabled={isLoading}
+      />
+      <button
+        type="submit"
+        disabled={isLoading || !message.trim()}
+        className="px-6 py-2 bg-indigo-600 text-white rounded-r hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+      >
+        Send
+      </button>
+    </form>
+  );
+};
+MessageInput.propTypes = {
+  channelId: PropTypes.string.isRequired, // channelId must be a string and is required
+};
+
+export default MessageInput;
+// MessageList.jsx
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMessages } from '../../features/messageSlice.js';
+
+const MessageList = () => {
+  const dispatch = useDispatch();
+  const messagesEndRef = useRef(null);
+  const { messages, isLoading } = useSelector((state) => state.message);
+  const currentChannel = useSelector((state) => state.channel.currentChannel);
+  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+
+  useEffect(() => {
+    if (currentWorkspace && currentChannel) {
+      dispatch(fetchMessages({
+        workspaceId: currentWorkspace.id,
+        channelId: currentChannel.id
+      }));
+    }
+  }, [currentWorkspace, currentChannel, dispatch]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  if (!currentChannel) return <div>Select a channel</div>;
+  if (isLoading) return <div>Loading messages...</div>;
+
+  return (
+    <div className="flex-1 overflow-y-auto p-4">
+      {messages.length === 0 ? (
+        <div className="text-gray-500">No messages yet</div>
+      ) : (
+        messages.map((message) => (
+          <div key={message.id} className="mb-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                  {message.username?.[0]?.toUpperCase()}
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">
+                  {message.username}
+                  <span className="ml-2 text-xs text-gray-500">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-700">{message.message}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+};
+
+export default MessageList;
+// UserList.jsx
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import { fetchChannelMembers } from '../../features/channelSlice.js';
+
+const UserList = ({ channelId }) => {
+  const dispatch = useDispatch();
+  const members = useSelector((state) => state.channel.members);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMembers = async () => {
+      setIsLoading(true);
+      try {
+        await dispatch(fetchChannelMembers(channelId)).unwrap();
+      } catch (error) {
+        console.error('Failed to fetch members:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMembers();
+  }, [channelId, dispatch]);
+
+  if (isLoading) {
+    return <div className="p-4">Loading members...</div>;
+  }
+
+  return (
+    <div className="p-4 border-l">
+      <h3 className="text-lg font-semibold mb-4">Channel Members</h3>
+      <ul className="space-y-2">
+        {members.map((member) => (
+          <li key={member.id} className="flex items-center space-x-2">
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span>{member.username}</span>
+            {member.role !== 'member' && (
+              <span className="text-xs text-gray-500 ml-1">({member.role})</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// Define prop types for validation
+UserList.propTypes = {
+  channelId: PropTypes.string.isRequired, // Ensure channelId is a required string
+};
+
+export default UserList;
+// ChatLayout.jsx
+import WorkspaceList from '../workspace/WorkspaceList';
+import ChannelList from '../chat/ChannelList';
+import MessageList from '../chat/MessageList';
+import MessageInput from '../chat/MessageInput';
+import Header from './Header';
+
+const ChatLayout = () => {
+  return (
+    <div className="h-screen flex">
+      <WorkspaceList />
+      <div className="flex-1 flex flex-col">
+        <Header />
+        <div className="flex-1 flex overflow-hidden">
+          <ChannelList />
+          <div className="flex-1 flex flex-col">
+            <MessageList />
+            <MessageInput />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChatLayout;
+// Header.jsx
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../features/authSlice.js';
+import { useNavigate } from 'react-router-dom';
+
+const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const user = useSelector((state) => state.auth.user);
+  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+  const authLoading = useSelector((state) => state.auth.loading);
+  const workspaceLoading = useSelector((state) => state.workspace.loading);
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      dispatch(logout());
+      navigate('/auth/login');
+    }
+  };
+
+  return (
+    <header className="bg-gray-800 text-white h-14 flex items-center justify-between px-4">
+      <div className="flex items-center">
+        <h1 className="text-xl font-bold">
+          {workspaceLoading ? 'Loading workspace...' : (currentWorkspace?.name || 'GDSC Slack')}
+        </h1>
+      </div>
+      <div className="flex items-center space-x-4">
+        <span>{authLoading ? 'Loading user...' : (user?.username || 'Guest')}</span>
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 transition-colors"
+          aria-label="Logout"
+        >
+          Logout
+        </button>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+// Sidebar.jsx
+import { useSelector } from 'react-redux';
+import WorkspaceList from '../workspace/WorkspaceList';
+import ChannelList from '../chat/ChannelList';
+
+const Sidebar = () => {
+  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+
+  return (
+    <div className="bg-gray-800 text-white w-64 flex flex-col h-full">
+      <WorkspaceList />
+      {currentWorkspace ? (
+        <div className="flex-1 overflow-y-auto">
+          <ChannelList/>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-400">Select a workspace to view channels</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Sidebar;
+// CreateWorkspace.jsx
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createWorkspace,fetchWorkspaces } from '../../features/workspaceSlice.js';
+import { Plus } from 'lucide-react';
+
+const CreateWorkspace = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      setError('Workspace name is required');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      dispatch(createWorkspace({ name })).unwrap();
+      dispatch(fetchWorkspaces());
+      setName(''); 
+      setShowModal(false);
+    } catch (err) {
+      setError(err.message || 'Failed to create workspace');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <button 
+        onClick={() => setShowModal(true)}
+        className="w-10 h-10 rounded-lg flex items-center justify-center text-white mb-2 bg-gray-700 hover:bg-gray-600"
+        aria-label="Create a new workspace"
+      >
+        <Plus size={20} />
+      </button>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full">
+            <h2 className="text-lg font-semibold mb-4">Create a new Workspace</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label htmlFor="workspace-name" className="block text-sm font-medium text-gray-700">
+                  Workspace Name
+                </label>
+                <input
+                  type="text"
+                  id="workspace-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Enter workspace name"
+                />
+              </div>
+
+              {error && (
+                <div className="text-red-600 text-sm mb-4">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isLoading || !name.trim()}
+                  className={`${
+                    isLoading || !name.trim() ? 'bg-indigo-300' : 'bg-indigo-600 hover:bg-indigo-700'
+                  } text-white font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                >
+                  {isLoading ? 'Creating...' : 'Create Workspace'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="ml-2 py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default CreateWorkspace;
+// WorkspaceList.jsx
+import PropTypes from 'prop-types'; 
+import CreateWorkspace from './CreateWorkspace.jsx';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; // Missing import for dispatch
+import { setCurrentWorkspace } from '../../features/workspaceSlice.js';
+
+const WorkspaceList = ({ workspaces }) => {
+  const dispatch = useDispatch(); // Initialize dispatch
+  const navigate = useNavigate();
+
+  const handleWorkspaceClick = (workspace) => {
+    dispatch(setCurrentWorkspace(workspace));
+    navigate(`/workspace/${workspace.id}`);
+  };
+
+  return (
+    <div className="h-full bg-gray-800 w-16 flex-shrink-0 flex flex-col items-center py-4">
+      {workspaces.length === 0 ? (
+        <div className="text-gray-500">No workspaces available</div>
+      ) : (
+        workspaces.map((workspace) => (
+          <button
+            key={workspace.id}
+            onClick={() => handleWorkspaceClick(workspace)}
+            className="w-10 h-10 rounded-lg mb-2 flex items-center justify-center text-white font-semibold bg-gray-700 hover:bg-gray-600"
+          >
+            {workspace.name.charAt(0).toUpperCase() + workspace.name.slice(1).toLowerCase()}
+          </button>
+        ))
+      )}
+
+      <CreateWorkspace />
+    </div>
+  );
+};
+
+// Prop types validation
+WorkspaceList.propTypes = {
+  workspaces: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired
+  })).isRequired,
+};
+
+export default WorkspaceList;
+// authSlice.js
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../api/axios.js';
+
+// Login action
+export const login = createAsyncThunk(
+    'auth/login',
+    async (credentials, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/login', credentials);
+            localStorage.setItem('token', response.data.token);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Register action
+export const register = createAsyncThunk(
+    'auth/register',
+    async (userData, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/register', userData);
+            localStorage.setItem('token', response.data.token);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const forgotPassword = createAsyncThunk(
+    'auth/forgotPassword',
+    async ({email}, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/auth/forgot-password', { email });
+            return response.data; // Assuming this returns a success message
+        } catch (error) {
+            return rejectWithValue(error.response?.data || 'Failed to send reset link');
+        }
+    }
+);
+
+const authSlice = createSlice({
+    name: 'auth',
+    initialState: {
+        user: null,
+        token: localStorage.getItem('token'),
+        isLoading: false,
+        error: null,
+    },
+    reducers: {
+        logout: (state) => {
+            state.user = null;
+            state.token = null;
+            localStorage.removeItem('token');
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // Login
+            .addCase(login.pending, (state) => {
+                state.isLoading = true;
+                state.user = null;
+            })
+            .addCase(login.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+            })
+            .addCase(login.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Login failed';
+            })
+            // Register
+            .addCase(register.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(register.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.error = null; // Fixing to not assign user to error
+                state.token = action.payload.token;
+            })
+            .addCase(register.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Registration failed';
+            })
+            // Forgot Password
+            .addCase(forgotPassword.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.isLoading = false;
+                state.error = null;
+            })
+            .addCase(forgotPassword.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Forgot Password request failed';
+            });
+    },
+});
+
+// Exporting actions and reducer
+export const { logout } = authSlice.actions;
+export default authSlice.reducer;
+// channelSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../api/axios.js";
+
+// Fetch channels for a workspace
+export const fetchChannels = createAsyncThunk(
+    'channel/fetchChannels',
+    async (workspaceId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/workspace/${workspaceId}/channel/`);
+            // console.log(response.data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Create a new channel
+export const createChannel = createAsyncThunk(
+    'channel/createChannel',
+    async ({ workspaceId, channelData }, { rejectWithValue }) => {
+        try {
+            const response = await api.post(`/workspace/${workspaceId}/channel/`, channelData);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+// Fetch members for a specific channel
+export const fetchChannelMembers = createAsyncThunk(
+    'channel/fetchChannelMembers',
+    async (channelId, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/channel/${channelId}/members`);
+            return response.data; // Assuming this returns the list of members
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+const channelSlice = createSlice({
+    name: 'channel',
+    initialState: {
+        channels: [],
+        currentChannel: null,
+        channelMembers: [], // New state to hold channel members
+        isLoading: false,
+        error: null,
+    },
+    reducers: {
+        setCurrentChannel: (state, action) => {
+            state.currentChannel = action.payload;
+        },
+        setChannelMembers: (state, action) => {
+            state.channelMembers = action.payload; // Action to set channel members
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // Fetch channels
+            .addCase(fetchChannels.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(fetchChannels.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.channels = action.payload;
+            })
+            .addCase(fetchChannels.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Failed to fetch channels';
+            })
+            // Create channel
+            .addCase(createChannel.fulfilled, (state, action) => {
+                state.channels.push(action.payload);
+            })
+            // Fetch channel members
+            .addCase(fetchChannelMembers.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(fetchChannelMembers.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.channelMembers = action.payload; // Save fetched members
+            })
+            .addCase(fetchChannelMembers.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Failed to fetch channel members';
+            });
+    },
+});
+
+// Exporting actions and reducer
+export const { setCurrentChannel, setChannelMembers } = channelSlice.actions;
+export default channelSlice.reducer;
+// messageSlice.js
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit';
+import api from '../api/axios.js';
+
+export const fetchMessages = createAsyncThunk(
+    'message/fetchMessages',
+    async ({workspaceId,channelId},{rejectWithValue})=>{
+        try{
+            const response = await api.get(`/workspace/${workspaceId}/channel/${channelId}/messages`);
+            return response.data;
+        }catch(error){
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+const messageSlice = createSlice({
+    name : 'message',
+    initialState:{
+        messages:[],
+        isLoading:false,
+        error:null, 
+      },
+      reducers:{
+        addMessage:(state,action)=>{
+            state.messages.push(action.payload);
+        },
+        updateMessage:(state,action)=>{
+            const index = state.messages.findIndex(msg=>msg.id === action.payload.id);
+            if(index !== -1){
+                state.messages[index]=action.payload;
+            }
+        },
+        deleteMessage : (state,action)=>{
+            state.messages = state.messages.filter(msg=>msg.id !== action.payload);
+        },
+      },
+      extraReducers:(builder)=>{
+        builder
+        .addCase(fetchMessages.pending,(state)=>{
+            state.isLoading=true;
+        })
+        .addCase(fetchMessages.fulfilled,(state,action)=>{
+            state.isLoading=false;
+            state.messages=action.payload;
+        })
+        .addCase(fetchMessages.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.error = action.payload?.message || 'Failed to fetch messages';
+        });
+      },
+});
+
+export const {addMessage,updateMessage,deleteMessage} = messageSlice.actions;
+export default messageSlice.reducer;
+// workspaceSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from '../api/axios.js';
+
+export const fetchWorkspaces = createAsyncThunk(
+    'workspace/fetchWorkspaces',
+    async(_,{rejectWithValue})=>{
+        try{
+            const response = await api.get('/workspace/');
+            console.log(response.data);
+            return response.data.workspaces;
+        }catch(error){
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const createWorkspace = createAsyncThunk(
+    'workspace/createWorkspace',
+    async(workspaceData,{rejectWithValue})=>{
+        try{
+            const response = await api.post('/workspace/',workspaceData);
+            return response.data;
+        }catch(error){
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+const workspaceSlice = createSlice({
+    name:'workspace',
+    initialState:{
+        workspaces:[],
+        currentWorkspace:null,
+        isLoading:false,
+        error:null,
+    },
+    reducers:{
+        setCurrentWorkspace:(state,action)=>{
+            state.currentWorkspace=action.payload;
+        },
+    },
+    extraReducers:(builder)=>{
+        builder
+        .addCase(fetchWorkspaces.pending,(state)=>{
+            state.isLoading=true;
+        })
+        .addCase(fetchWorkspaces.fulfilled,(state,action)=>{
+            state.isLoading=false;
+            state.workspaces=action.payload;
+        })
+        .addCase(fetchWorkspaces.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.workspaces=action.payload?.message || 'Failed to fetch workspaces';
+        })
+        .addCase(createWorkspace.fulfilled,(state,action)=>{
+            state.workspaces.push(action.payload);
+        });
+    },
+});
+
+export const {setCurrentWorkspace} = workspaceSlice.actions;
+export default workspaceSlice.reducer;
+// useSocket.js
+import { useEffect, useRef } from "react";
+import {io} from 'socket.io-client';
+import { useSelector } from "react-redux";
+
+const useSocket = () =>{
+    const socketRef = useRef();
+    const token = useSelector((state)=>state.auth.token);
+
+    useEffect(()=>{
+        if(token){
+            socketRef.current = io('http://localhost:3000',{
+                auth:{
+                    token,
+                },
+            });
+
+            return ()=>{
+                if(socketRef.current){
+                    socketRef.current.disconnect();
+                }
+            };
+        }
+    },[token]);
+
+    const joinChannel = (channelId)=>{
+        if(socketRef.current){
+            socketRef.current.emit('joinRoom',channelId);
+        }
+    };
+
+    const sendMessage = (messageData) =>{
+        if(socketRef.current){
+            socketRef.current.emit('sendMessage',messageData);
+        }
+    };
+
+    return {
+        socket : socketRef.current,
+        joinChannel,
+        sendMessage,
+    };
+};
+
+export default useSocket;
+// AuthPage.jsx
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from '../components/auth/Login';
+import Register from '../components/auth/Register';
+import ForgotPassword from '../components/auth/ForgotPassword';
+import { useSelector } from 'react-redux';
+
+const AuthPage = () => {
+  const { token } = useSelector((state) => state.auth);
+
+  // Redirect to /workspaces if already authenticated
+  if (token) {
+    return <Navigate to="/workspace" replace />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <main className="w-full max-w-md space-y-8">
+        <Routes>
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="*" element={<Navigate to="login" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
+export default AuthPage;
+// ChatPage.jsx
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+import Header from '../components/layout/Header';
+import Sidebar from '../components/layout/Sidebar';
+import MessageList from '../components/chat/MessageList';
+import MessageInput from '../components/chat/MessageInput';
+import UserList from '../components/chat/UserList';
+import { fetchMessages } from '../features/messageSlice.js';
+import useSocket from '../hooks/useSocket.js';
+
+const ChatPage = () => {
+  const { workspaceId, channelId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { joinChannel } = useSocket();
+
+  useEffect(() => {
+    if (!workspaceId || !channelId) {
+      navigate('/'); // Redirect if no workspace or channel is selected
+    } else {
+      dispatch(fetchMessages(channelId));
+      joinChannel(channelId);
+    }
+  }, [channelId, dispatch, joinChannel, navigate, workspaceId]);
+
+  if (!workspaceId || !channelId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-gray-500">Select a workspace and channel</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 flex overflow-hidden">
+        <Sidebar />
+        <main className="flex-1 flex flex-col">
+          <div className="flex-1 overflow-y-auto">
+            <MessageList />
+          </div>
+          <MessageInput />
+        </main>
+        <UserList />
+      </div>
+    </div>
+  );
+};
+
+export default ChatPage;
+// NotFound.jsx
+const NotFound = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-gray-800">404</h1>
+        <p className="mt-4 text-lg text-gray-600">Oops! The page you are looking for does not exist.</p>
+        <a href="/workspaces" className="mt-6 inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+          Go to Workspaces
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default NotFound;
+// WorkspacePage.jsx
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Header from '../components/layout/Header.jsx';
+import WorkspaceList from '../components/workspace/WorkspaceList.jsx';
+import { fetchWorkspaces} from '../features/workspaceSlice.js';
+
+
+const WorkspacePage = () => {
+  const dispatch = useDispatch();
+  const { workspaces, isLoading, error } = useSelector((state) => state.workspace);
+
+  useEffect(() => {
+    dispatch(fetchWorkspaces());
+  }, [dispatch]);
+
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <span className="text-gray-500">Loading workspaces...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-red-500">Error: {error}</p>
+        <button
+          onClick={() => dispatch(fetchWorkspaces())}
+          className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col">
+      <Header />
+      <div className="flex-1 p-6">
+        <h2 className="text-2xl font-bold mb-4">Your Workspaces</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <WorkspaceList workspaces={workspaces} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WorkspacePage;
+// App.jsx
+import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './app/store.js';
+import AuthPage from './pages/AuthPage.jsx';
+import WorkspacePage from './pages/WorkspacePage.jsx'
+import PrivateRoute from './components/auth/PrivateRoute.jsx';
+import ChannelList from './components/chat/ChannelList.jsx';
+const App = () => {
+  return (
+    <Provider store={store}>
+    <Router>
+      <Routes>
+        <Route path='/auth/*' element={<AuthPage/>}/>
+        <Route path='/workspace' element={<PrivateRoute><WorkspacePage/></PrivateRoute>}/>
+        <Route path="/workspace/:workspaceId" element={<PrivateRoute><ChannelList/></PrivateRoute>} />
+      </Routes>
+    </Router>
+    </Provider>
+  );
+};
+export default App;
+// main.jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
