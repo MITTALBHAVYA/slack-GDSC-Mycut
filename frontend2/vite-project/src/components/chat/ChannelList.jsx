@@ -1,32 +1,46 @@
 // ChannelList.jsx
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChannels, setCurrentChannel } from '../../features/channelSlice.js';
 
 const ChannelList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { channels, currentChannel, isLoading } = useSelector((state) => state.channel);
-  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+  const { currentWorkspace } = useSelector((state) => state.workspace);
   const [localChannels, setLocalChannels] = useState([]);
+  const [pendingChannel, setPendingChannel] = useState(null); // Added pendingChannel state
 
   useEffect(() => {
     if (currentWorkspace) {
       dispatch(fetchChannels(currentWorkspace.id));
+      setLocalChannels([]);
     }
   }, [currentWorkspace, dispatch]);
 
-  useEffect(()=>{
-    if(channels && channels.channels && channels.channels[0]){
+  useEffect(() => {
+    if (channels && channels.channels && channels.channels[0]) {
       setLocalChannels(channels.channels[0]);
     }
-  },[channels]);
+  }, [channels]);
 
   const handleChannelClick = (channel) => {
+    setPendingChannel(channel); // Set the pending channel first
     dispatch(setCurrentChannel(channel));
   };
 
+  useEffect(() => {
+    // Only navigate when the currentChannel matches the pendingChannel
+    if (pendingChannel && currentChannel?.id === pendingChannel.id) {
+      navigate(`/workspace/${currentWorkspace.id}/${currentChannel.id}`);
+      setPendingChannel(null); // Reset pending channel after navigation
+    }
+  }, [currentChannel, pendingChannel, navigate, currentWorkspace]);
+
   if (!currentWorkspace) return <div>Select a workspace</div>;
   if (isLoading) return <div>Loading channels...</div>;
+
   return (
     <div className="bg-gray-700 w-64 flex-shrink-0">
       <div className="px-4 py-2 border-b border-gray-600">

@@ -17,7 +17,7 @@ export const sendMessage = catchAsyncErrors(async(req,res,next)=>{
       return next(new ErrorHandler("Failed to send the message",500));
    }
 
-   req.status(201).json({
+   res.status(201).json({
     success:true,
     message
    });
@@ -30,13 +30,9 @@ export const getChannelMessages = catchAsyncErrors(async(req,res,next)=>{
    .sort({timestamp:-1})
    .limit(50);
 
-   if(!messages || messages.length === 0){
-      return next(new ErrorHandler("No messages found for this channel",404));
-   }
-
    res.status(200).json({
-      success:true,
-      messages
+      success: true,
+      messages: messages || []
    });
 });
 

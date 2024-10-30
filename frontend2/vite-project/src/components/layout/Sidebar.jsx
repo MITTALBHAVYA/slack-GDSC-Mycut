@@ -4,13 +4,14 @@ import WorkspaceList from '../workspace/WorkspaceList';
 import ChannelList from '../chat/ChannelList';
 
 const Sidebar = () => {
-  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+  const { workspaces,currentWorkspace } = useSelector((state) => state.workspace);
+  // const { currentWorkspace } = useSelector((state) => state.workspace);
 
   return (
     <div className="bg-gray-800 text-white w-64 flex flex-col h-full">
-      <WorkspaceList />
+      <WorkspaceList workspaces={workspaces}/>
       {currentWorkspace ? (
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-3 overflow-y-auto">
           <ChannelList/>
         </div>
       ) : (

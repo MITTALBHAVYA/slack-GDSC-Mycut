@@ -1,31 +1,34 @@
 // UserList.jsx
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import { fetchChannelMembers } from '../../features/channelSlice.js';
+import PropTypes from 'prop-types';
 
-const UserList = ({ channelId }) => {
+const UserList = ({ workspaceId, channelId }) => {
   const dispatch = useDispatch();
-  const members = useSelector((state) => state.channel.members);
+  // const { channelMembers } = useSelector((state) => state.channel);
   const [isLoading, setIsLoading] = useState(true);
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
     const loadMembers = async () => {
       setIsLoading(true);
       try {
-        await dispatch(fetchChannelMembers(channelId)).unwrap();
+        const response = await dispatch(fetchChannelMembers({ workspaceId, channelId })).unwrap();
+        setMembers(response.data); // Assuming `response.data` contains the members array
+        console.log("Fetched channel members:", response.data);
       } catch (error) {
-        console.error('Failed to fetch members:', error);
+        console.error('Failed to fetch channel members:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadMembers();
-  }, [channelId, dispatch]);
+  }, [workspaceId, channelId, dispatch]);
 
   if (isLoading) {
-    return <div className="p-4">Loading members...</div>;
+    return <div className="p-4">Loading channel members...</div>;
   }
 
   return (
@@ -33,7 +36,7 @@ const UserList = ({ channelId }) => {
       <h3 className="text-lg font-semibold mb-4">Channel Members</h3>
       <ul className="space-y-2">
         {members.map((member) => (
-          <li key={member.id} className="flex items-center space-x-2">
+          <li key={member.userId} className="flex items-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-green-500" />
             <span>{member.username}</span>
             {member.role !== 'member' && (
@@ -46,9 +49,9 @@ const UserList = ({ channelId }) => {
   );
 };
 
-// Define prop types for validation
 UserList.propTypes = {
-  channelId: PropTypes.string.isRequired, // Ensure channelId is a required string
+  workspaceId: PropTypes.string.isRequired,
+  channelId: PropTypes.string.isRequired,
 };
 
 export default UserList;

@@ -10,8 +10,11 @@ const MessageList = () => {
   const currentChannel = useSelector((state) => state.channel.currentChannel);
   const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
 
+  console.log("message list ", messages, "here is messages.messages", messages.messages);
+
   useEffect(() => {
     if (currentWorkspace && currentChannel) {
+      console.log("message list currentWorkspace : ", currentWorkspace, " currentChannel : ", currentChannel);
       dispatch(fetchMessages({
         workspaceId: currentWorkspace.id,
         channelId: currentChannel.id
@@ -26,12 +29,15 @@ const MessageList = () => {
   if (!currentChannel) return <div>Select a channel</div>;
   if (isLoading) return <div>Loading messages...</div>;
 
+  // Access the nested messages array safely
+  const messageArray = messages.messages || [];
+
   return (
     <div className="flex-1 overflow-y-auto p-4">
-      {messages.length === 0 ? (
+      {messageArray.length === 0 ? (
         <div className="text-gray-500">No messages yet</div>
       ) : (
-        messages.map((message) => (
+        messageArray.map((message) => (
           <div key={message.id} className="mb-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">

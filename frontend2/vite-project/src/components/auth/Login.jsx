@@ -13,7 +13,7 @@ const Login = () =>{
 
     const handleSubmit = async(e)=>{
         e.preventDefault();
-        const result = await dispatch(login({email, password}));
+        const result = dispatch(login({email, password}));
         if(!result.error){
             navigate('/workspace');
         }
