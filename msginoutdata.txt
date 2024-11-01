@@ -1,0 +1,481 @@
+#here is the frontend part
+
+// MessageList.jsx
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMessages } from '../../features/messageSlice.js';
+const MessageList = () => {
+  const dispatch = useDispatch();
+  const messagesEndRef = useRef(null);
+  const { messages, isLoading } = useSelector((state) => state.message);
+  const currentChannel = useSelector((state) => state.channel.currentChannel);
+  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
+  console.log("message list ", messages, "here is messages.messages", messages.messages);
+  useEffect(() => {
+    if (currentWorkspace && currentChannel) {
+      console.log("message list currentWorkspace : ", currentWorkspace, " currentChannel : ", currentChannel);
+      dispatch(fetchMessages({
+        workspaceId: currentWorkspace.id,
+        channelId: currentChannel.id
+      }));
+    }
+  }, [currentWorkspace, currentChannel, dispatch]);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  if (!currentChannel) return <div>Select a channel</div>;
+  if (isLoading) return <div>Loading messages...</div>;
+  const messageArray = messages.messages || [];
+  return (
+    <div className="flex-1 overflow-y-auto p-4">
+      {messageArray.length === 0 ? (
+        <div className="text-gray-500">No messages yet</div>
+      ) : (
+        messageArray.map((message) => (
+          <div key={message.id} className="mb-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
+                  {message.username?.[0]?.toUpperCase()}
+                </div>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">
+                  {message.username}
+                  <span className="ml-2 text-xs text-gray-500">
+                    {new Date(message.timestamp).toLocaleTimeString()}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-700">{message.message}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+};
+export default MessageList;
+
+// MessageInput.jsx
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import useSocket from '../../hooks/useSocket.js';
+const MessageInput = ({ channelId }) => {
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { sendMessage } = useSocket();
+  const userId = useSelector((state) => state.auth.user?.id);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    setIsLoading(true);
+    try {
+      sendMessage({
+        channelId,
+        message: message.trim(),
+        userId,
+      });
+      setMessage('');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  return (
+    <form onSubmit={handleSubmit} className="flex items-center p-4 border-t">
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type a message..."
+        className="flex-grow px-4 py-2 border rounded-l focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        disabled={isLoading}
+      />
+      <button
+        type="submit"
+        disabled={isLoading || !message.trim()}
+        className="px-6 py-2 bg-indigo-600 text-white rounded-r hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+      >
+        Send
+      </button>
+    </form>
+  );
+};
+MessageInput.propTypes = {
+  channelId: PropTypes.string.isRequired, // channelId must be a string and is required
+};
+export default MessageInput;
+
+// messageSlice.js
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit';
+import api from '../api/axios.js';
+export const fetchMessages = createAsyncThunk(
+    'message/fetchMessages',
+    async ({workspaceId,channelId},{rejectWithValue})=>{
+        try{
+            const response = await api.get(`/workspace/${workspaceId}/channel/${channelId}/messages`);
+            return response.data;
+        }catch(error){
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+const messageSlice = createSlice({
+    name : 'message',
+    initialState:{
+        messages:[],
+        isLoading:false,
+        error:null, 
+      },
+      reducers:{
+        addMessage:(state,action)=>{
+            state.messages.push(action.payload);
+        },
+        updateMessage:(state,action)=>{
+            const index = state.messages.findIndex(msg=>msg.id === action.payload.id);
+            if(index !== -1){
+                state.messages[index]=action.payload;
+            }
+        },
+        deleteMessage : (state,action)=>{
+            state.messages = state.messages.filter(msg=>msg.id !== action.payload);
+        },
+      },
+      extraReducers:(builder)=>{
+        builder
+        .addCase(fetchMessages.pending,(state)=>{
+            state.isLoading=true;
+        })
+        .addCase(fetchMessages.fulfilled,(state,action)=>{
+            state.isLoading=false;
+            state.messages=action.payload;
+        })
+        .addCase(fetchMessages.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.error = action.payload?.message || 'Failed to fetch messages';
+        });
+      },
+});
+export const {addMessage,updateMessage,deleteMessage} = messageSlice.actions;
+export default messageSlice.reducer;
+
+// useSocket.js
+import { useEffect, useRef } from "react";
+import {io} from 'socket.io-client';
+import { useSelector } from "react-redux";
+const useSocket = () =>{
+    const socketRef = useRef();
+    const token = useSelector((state)=>state.auth.token);
+    useEffect(()=>{
+        if(token){
+            socketRef.current = io('http://localhost:3000',{
+                auth:{
+                    token,
+                },
+            });
+            return ()=>{
+                if(socketRef.current){
+                    socketRef.current.disconnect();
+                }
+            };
+        }
+    },[token]);
+    const joinChannel = (channelId)=>{
+        if(socketRef.current){
+            socketRef.current.emit('joinRoom',channelId);
+        }
+    };
+    const sendMessage = (messageData) =>{
+        if(socketRef.current){
+            socketRef.current.emit('sendMessage',messageData);
+        }
+    };
+    return {
+        socket : socketRef.current,
+        joinChannel,
+        sendMessage,
+    };
+};
+export default useSocket;
+
+// store.js
+import {configureStore} from '@reduxjs/toolkit';
+import authReducer from '../features/authSlice.js';
+import channelReducer from '../features/channelSlice.js';
+import messageReducer from '../features/messageSlice.js';
+import workspaceReducer from '../features/workspaceSlice.js';
+export const store = configureStore({
+    reducer:{
+        auth : authReducer,
+        channel:channelReducer,
+        message:messageReducer,
+        workspace:workspaceReducer,
+    },
+});
+export default store;
+
+#here is the backend
+
+//messageController.js
+import { Message } from "../models/messageModel.js";
+import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
+import ErrorHandler from "../middleware/errorHandler.js";
+export const sendMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {content} = req.body;
+   const {channelId} = req.params;
+   const message = await Message.create({
+    message : content,
+    channel_id : channelId,
+    user_id : req.user.id
+   });
+   if(!message){
+      return next(new ErrorHandler("Failed to send the message",500));
+   }
+   res.status(201).json({
+    success:true,
+    message
+   });
+});
+export const getChannelMessages = catchAsyncErrors(async(req,res,next)=>{
+   const {channelId} = req.params;
+   const messages = await Message.find({channel_id:channelId})
+   .sort({timestamp:-1})
+   .limit(50);
+   res.status(200).json({
+      success: true,
+      messages: messages || []
+   });
+});
+export const editMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {messageId} = req.params;
+   const {content} = req.body;
+   if(!content || content.trim()===""){
+      return next(new ErrorHandler("Message content cannot be empty",400));
+   }
+   const message = await Message.findById(messageId);
+   if(!message){
+      return next(new ErrorHandler("Message not found",404));
+   }
+   if(message.user_id !== req.user.id){
+      return next(new ErrorHandler("Not authorized to edit this message",403));
+   }
+   message.message = content;
+   message.edited = true;
+   await message.save();
+   res.status(200).json({
+      success:true,
+      message
+   });
+});
+export const deleteMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {messageId} = req.params;
+   const message = await Message.findById(messageId);
+   if(!message){
+      return next(new ErrorHandler("Message not found",404));
+   }
+   const userRole = req.userchannelrel.role;
+   if((userRole==='member' || userRole==='guest') && message.user_id !==req.user.id){
+      return next(new ErrorHandler("Not authorized to delete this message",403));
+   }
+   if(userRole==='owner' || userRole==='admin' || message.user_id === req.user.id){
+      await message.deleteOne();
+      return res.status(200).json({
+         success : true,
+         message:"Message deleted successfully"
+      });
+   }else{
+      return next(new ErrorHandler("Not authorized to delete this message",403));
+   }
+});
+
+//checkUserRole.js
+import UserChannelRelation from "../models/userChannelRelationModel.js";
+import ErrorHandler from "./errorHandler.js";
+import { catchAsyncErrors } from "./catchAsyncErrors.js";
+export const checkUserRole = (...acceptedRoles)=>{
+    return catchAsyncErrors(async(req,res,next)=>{
+        const userId = req.user.id;
+        const {channelId} = req.params;
+        const userChannelRelation = await UserChannelRelation.findOne({
+            where : {
+                user_id : userId,
+                channel_id : channelId,
+            },
+        });
+        if(!userChannelRelation){
+            return next(new ErrorHandler("User is not associated with this channel",403));
+        }
+        const userRole = userChannelRelation.role;
+        if(!acceptedRoles.includes(userRole)){
+            return next(new ErrorHandler("Access denied. Insufficient role permission.",403));
+        }
+        req.userchannelrel = userChannelRelation;
+        next();
+    });
+};
+
+//messageModel.js
+import mongoose from 'mongoose';
+const messageSchema = new mongoose.Schema({
+    message: {
+        type: String,
+        required: true,
+    },
+    channel_id: {
+        type: String,
+        required: true,
+    },
+    user_id: {
+        type: String,
+        required: true,
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now,
+    },
+    attachments: [
+        {
+            filename: String,
+            url: String,
+            filetype: String,
+        },
+    ],
+    edited: {
+        type: Boolean,
+        default: false,
+    },
+    reactions: [{
+        user_id: String,
+        reaction: String,
+    }]
+});
+export const Message = mongoose.model("Message", messageSchema);
+
+//messageRoutes.js
+import express from 'express';
+import {isAuthorized} from "../middleware/authMiddleware.js";
+import { checkUserRole } from '../middleware/checkUserRole.js';
+import {
+    sendMessage,
+    getChannelMessages,
+    editMessage,
+    deleteMessage,
+} from "../controllers/messageController.js";
+const router = express.Router({mergeParams:true});
+router.post("/",isAuthorized,checkUserRole('owner','admin','member','guest'),sendMessage);
+router.get("/",isAuthorized,checkUserRole('owner','admin','member','guest'),getChannelMessages);
+router.put("/:messageId",isAuthorized,checkUserRole('owner','admin','member','guest'),editMessage);
+router.delete("/:messageId",isAuthorized,checkUserRole('owner','admin','member','guest'),deleteMessage);
+export default router;
+
+//app.js
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { errorMiddleware } from './middleware/errorHandler.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js'
+import channelRoutes from './routes/channelRoutes.js';
+import messageRoutes from "./routes/messageRoutes.js";
+import userChannelRelationRoutes from './routes/userChannelRelationRoutes.js'
+import workspaceRoutes from './routes/workspaceRoutes.js';
+import './models/index.js';
+dotenv.config();
+const app = express();
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/user',userRoutes);
+app.use('/api/v1/workspace', workspaceRoutes);
+app.use('/api/v1/workspace/:workspaceId/channel', channelRoutes);
+app.use('/api/v1/workspace/:workspaceId/channel/:channelId',userChannelRelationRoutes);
+app.use('/api/v1/workspace/:workspaceId/channel/:channelId/messages', messageRoutes);
+app.use(errorMiddleware); 
+export default app;
+
+//server.js
+import http from 'http';
+import app from './app.js'; // Importing your Express app
+import dotenv from 'dotenv';
+import { Server as SocketIOServer } from 'socket.io';
+import postgresConnection from './config/databases/postgreconn.js';
+import mongoConnection from './config/databases/mongoconn.js';
+import JwtService from './services/jwtServices.js'
+import { Message } from './models/messageModel.js';
+dotenv.config(); // Load environment variables
+// Set up the port from environment variables or default to 5000
+const PORT = process.env.PORT || 3000;
+async function startServer() {
+  try {
+    await postgresConnection.authenticate();
+    console.log("PostgreSQL connection has been established successfully");
+    await mongoConnection();
+    console.log("MongoDB connection has been established successfully");
+    const server = http.createServer(app);
+    const io = new SocketIOServer(server, {
+      cors: {
+        origin: process.env.FRONTEND_URL,
+        methods: ['GET', 'POST'],
+      },
+    });
+      io.use(async (socket, next) => {
+        try {
+          const token = socket.handshake.auth.token;
+          const decoded = await JwtService.verifyToken(token);
+          socket.user = decoded;
+          next();
+        } catch (err) {
+          next(new Error('Authentication error'));
+        }
+      });
+      io.on('connection', (socket) => {
+        console.log('A user connected: ', socket.id);
+        socket.on('joinRoom', (channelId) => {
+          socket.join(channelId);
+          console.log(`User ${socket.id} joined room ${channelId}`);
+        });
+      socket.on('sendMessage', async (messageData) => {
+        try {
+          const { channelId, message, userId } = messageData;
+          const newMessage = new Message({
+            message: message,
+            channel_id: channelId,
+            user_id: userId,
+            timestamp: new Date(),
+          });
+          await newMessage.save();
+          io.to(channelId).emit('newMessage', newMessage);
+        } catch (error) {
+          socket.emit('error', {
+            message: 'Failed to send message'
+          });
+        }
+      });
+      socket.on('disconnect', () => {
+        console.log(`User ${socket.id} disconnected`);
+      });
+    });
+    // Start listening on the specified port
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.log('Unable to start the server: ', error);
+    process.exit(1);
+  }
+}
+// Create the HTTP server and pass in the Express app
+startServer();

@@ -54,14 +54,12 @@ async function startServer() {
       socket.on('sendMessage', async (messageData) => {
         try {
           const { channelId, message, userId } = messageData;
-          const newMessage = new Message({
+          const newMessage = await Message.create({
             message: message,
             channel_id: channelId,
             user_id: userId,
             timestamp: new Date(),
           });
-          await newMessage.save();
-
           io.to(channelId).emit('newMessage', newMessage);
         } catch (error) {
           socket.emit('error', {

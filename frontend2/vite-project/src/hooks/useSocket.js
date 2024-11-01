@@ -1,10 +1,12 @@
 // useSocket.js
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import {io} from 'socket.io-client';
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
+import { addMessage } from "../features/messageSlice";
 
 const useSocket = () =>{
     const socketRef = useRef();
+    const dispatch = useDispatch();
     const token = useSelector((state)=>state.auth.token);
 
     useEffect(()=>{
@@ -14,26 +16,31 @@ const useSocket = () =>{
                     token,
                 },
             });
-
+            socketRef.current.on('newMessage',(message)=>{
+                dispatch(addMessage(message));
+            });
+            socketRef.current.on('error',(error)=>{
+                console.error('Socket error: ',error);
+            });
             return ()=>{
                 if(socketRef.current){
                     socketRef.current.disconnect();
                 }
             };
         }
-    },[token]);
+    },[token,dispatch]);
 
-    const joinChannel = (channelId)=>{
+    const joinChannel = useCallback((channelId)=>{
         if(socketRef.current){
             socketRef.current.emit('joinRoom',channelId);
         }
-    };
+    },[]);
 
-    const sendMessage = (messageData) =>{
-        if(socketRef.current){
-            socketRef.current.emit('sendMessage',messageData);
+    const sendMessage = useCallback((messageData) => {
+        if (socketRef.current) {
+          socketRef.current.emit('sendMessage', messageData);
         }
-    };
+    }, []);
 
     return {
         socket : socketRef.current,

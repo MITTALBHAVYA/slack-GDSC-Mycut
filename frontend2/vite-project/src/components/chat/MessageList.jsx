@@ -1,53 +1,64 @@
 // MessageList.jsx
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMessages } from '../../features/messageSlice.js';
+import { addMessage, fetchMessages } from '../../features/messageSlice.js';
+import useSocket from '../../hooks/useSocket.js';
+import PropTypes from 'prop-types';
 
-const MessageList = () => {
+const MessageList = ({workspaceId,channelId}) => {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
+  const {socket} = useSocket();
   const { messages, isLoading } = useSelector((state) => state.message);
-  const currentChannel = useSelector((state) => state.channel.currentChannel);
-  const currentWorkspace = useSelector((state) => state.workspace.currentWorkspace);
 
   console.log("message list ", messages, "here is messages.messages", messages.messages);
 
   useEffect(() => {
-    if (currentWorkspace && currentChannel) {
-      console.log("message list currentWorkspace : ", currentWorkspace, " currentChannel : ", currentChannel);
+    if (workspaceId && channelId) {
+      console.log("message list workspaceId : ",workspaceId, " channelId : ",channelId);
       dispatch(fetchMessages({
-        workspaceId: currentWorkspace.id,
-        channelId: currentChannel.id
+        workspaceId,
+        channelId
       }));
     }
-  }, [currentWorkspace, currentChannel, dispatch]);
+  }, [channelId, dispatch, workspaceId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  if (!currentChannel) return <div>Select a channel</div>;
-  if (isLoading) return <div>Loading messages...</div>;
+  useEffect(()=>{
+    if(socket){
+      socket.on('newMessage',(message)=>{
+        dispatch(addMessage(message));
+      });
 
-  // Access the nested messages array safely
-  const messageArray = messages.messages || [];
+      return ()=>{
+        socket.off('newMessage');
+      }
+    }
+
+  },[socket,dispatch]);
+
+  if (!channelId) return <div>Select a channel</div>;
+  if (isLoading) return <div>Loading messages...</div>;
 
   return (
     <div className="flex-1 overflow-y-auto p-4">
-      {messageArray.length === 0 ? (
+      {messages.length === 0 ? (
         <div className="text-gray-500">No messages yet</div>
       ) : (
-        messageArray.map((message) => (
-          <div key={message.id} className="mb-4">
+        messages.map((message) => (
+          <div key={message._id} className="mb-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center text-white">
-                  {message.username?.[0]?.toUpperCase()}
+                  {message.user_id?.[0]?.toUpperCase()}
                 </div>
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">
-                  {message.username}
+                  {message.user_id}
                   <span className="ml-2 text-xs text-gray-500">
                     {new Date(message.timestamp).toLocaleTimeString()}
                   </span>
@@ -63,4 +74,8 @@ const MessageList = () => {
   );
 };
 
+MessageList.propTypes = {
+  workspaceId: PropTypes.string.isRequired,
+  channelId: PropTypes.string.isRequired,
+};
 export default MessageList;
