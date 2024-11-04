@@ -1,8 +1,10 @@
-// ChannelList.jsx
+// Updated ChannelList.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChannels, setCurrentChannel } from '../../features/channelSlice.js';
+import { PlusIcon } from 'lucide-react';
+import { CreateChannel } from './CreateChannel';
 
 const ChannelList = () => {
   const dispatch = useDispatch();
@@ -10,7 +12,8 @@ const ChannelList = () => {
   const { channels, currentChannel, isLoading } = useSelector((state) => state.channel);
   const { currentWorkspace } = useSelector((state) => state.workspace);
   const [localChannels, setLocalChannels] = useState([]);
-  const [pendingChannel, setPendingChannel] = useState(null); // Added pendingChannel state
+  const [pendingChannel, setPendingChannel] = useState(null);
+  const [showCreateChannel, setShowCreateChannel] = useState(false);
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -20,21 +23,24 @@ const ChannelList = () => {
   }, [currentWorkspace, dispatch]);
 
   useEffect(() => {
-    if (channels && channels.channels && channels.channels[0]) {
-      setLocalChannels(channels.channels[0]);
+    if (channels?.channels?.[0]) {
+      setLocalChannels(Array.isArray(channels.channels[0]) ? channels.channels[0] : []);
+    } else {
+      setLocalChannels([]);
     }
   }, [channels]);
 
   const handleChannelClick = (channel) => {
-    setPendingChannel(channel); // Set the pending channel first
-    dispatch(setCurrentChannel(channel));
+    if (channel?.id) {
+      setPendingChannel(channel);
+      dispatch(setCurrentChannel(channel));
+    }
   };
 
   useEffect(() => {
-    // Only navigate when the currentChannel matches the pendingChannel
     if (pendingChannel && currentChannel?.id === pendingChannel.id) {
       navigate(`/workspace/${currentWorkspace.id}/${currentChannel.id}`);
-      setPendingChannel(null); // Reset pending channel after navigation
+      setPendingChannel(null);
     }
   }, [currentChannel, pendingChannel, navigate, currentWorkspace]);
 
@@ -46,8 +52,19 @@ const ChannelList = () => {
       <div className="px-4 py-2 border-b border-gray-600">
         <h2 className="text-white font-semibold">{currentWorkspace.name}</h2>
       </div>
+
       <div className="px-2 py-2">
-        <h3 className="text-gray-400 text-sm mb-2">Channels</h3>
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-gray-400 text-sm">Channels</h3>
+          <button
+            onClick={() => setShowCreateChannel(true)}
+            className="text-gray-400 hover:text-white p-1 rounded hover:bg-gray-600"
+            title="Create Channel"
+          >
+            <PlusIcon size={16} />
+          </button>
+        </div>
+
         {localChannels.length === 0 ? (
           <div className="text-gray-400">No channels available</div>
         ) : (
@@ -61,11 +78,22 @@ const ChannelList = () => {
                   : 'text-gray-300 hover:bg-gray-600'
               }`}
             >
-              # {channel.name}
+              # {channel.name || 'may be error'}
             </button>
           ))
         )}
       </div>
+
+      {showCreateChannel && (
+        <CreateChannel
+          onClose={() => {
+            setShowCreateChannel(false);
+            if (currentWorkspace) {
+              dispatch(fetchChannels(currentWorkspace.id));
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

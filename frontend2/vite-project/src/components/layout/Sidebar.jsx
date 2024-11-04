@@ -5,7 +5,6 @@ import ChannelList from '../chat/ChannelList';
 
 const Sidebar = () => {
   const { workspaces,currentWorkspace } = useSelector((state) => state.workspace);
-  // const { currentWorkspace } = useSelector((state) => state.workspace);
 
   return (
     <div className="bg-gray-800 text-white w-64 flex flex-col h-full">

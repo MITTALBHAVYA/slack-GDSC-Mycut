@@ -18,7 +18,6 @@ const MessageInput = ({ channelId }) => {
 
     setIsLoading(true);
     try {
-      console.log("sending message : ",{channelId,message : message.trim(),userId});
       const newMessage = {
         channelId,
         message : message.trim(),

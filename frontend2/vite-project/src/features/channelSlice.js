@@ -8,7 +8,6 @@ export const fetchChannels = createAsyncThunk(
     async (workspaceId, { rejectWithValue }) => {
         try {
             const response = await api.get(`/workspace/${workspaceId}/channel/`);
-            // console.log(response.data);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -19,9 +18,10 @@ export const fetchChannels = createAsyncThunk(
 // Create a new channel
 export const createChannel = createAsyncThunk(
     'channel/createChannel',
-    async ({ workspaceId, channelData }, { rejectWithValue }) => {
+    async ({ workspaceId, channelData }, { rejectWithValue,dispatch }) => {
         try {
             const response = await api.post(`/workspace/${workspaceId}/channel/`, channelData);
+            dispatch(fetchChannels(workspaceId));
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -45,7 +45,7 @@ export const fetchChannelMembers = createAsyncThunk(
 const channelSlice = createSlice({
     name: 'channel',
     initialState: {
-        channels: [],
+        channels: {channels:[[]]},
         currentChannel: null,
         channelMembers: [], // New state to hold channel members
         isLoading: false,
@@ -68,14 +68,24 @@ const channelSlice = createSlice({
             .addCase(fetchChannels.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.channels = action.payload;
+                state.error = null;
             })
             .addCase(fetchChannels.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload?.message || 'Failed to fetch channels';
             })
             // Create channel
-            .addCase(createChannel.fulfilled, (state, action) => {
-                state.channels.push(action.payload);
+            .addCase(createChannel.pending,(state)=>{
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(createChannel.fulfilled, (state) => {
+                state.isLoading = false;
+                state.error = null;
+            })
+            .addCase(createChannel.rejected,(state,action)=>{
+                state.isLoading = false;
+                state.error = action.payload?.message || 'Failed to create channel';
             })
             // Fetch channel members
             .addCase(fetchChannelMembers.pending, (state) => {

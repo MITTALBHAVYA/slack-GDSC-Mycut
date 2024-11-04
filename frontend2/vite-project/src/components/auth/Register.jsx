@@ -38,7 +38,7 @@ const Register = () => {
       const { confirmPassword, ...registrationData } = formData;
       let k = confirmPassword;
       let result=k;
-      result = await dispatch(register(registrationData));
+      result = dispatch(register(registrationData));
       if (!result.error) {
         navigate('/workspaces');
       }

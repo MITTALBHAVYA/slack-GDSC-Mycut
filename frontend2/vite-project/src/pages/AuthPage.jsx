@@ -7,8 +7,6 @@ import { useSelector } from 'react-redux';
 
 const AuthPage = () => {
   const { token } = useSelector((state) => state.auth);
-
-  // Redirect to /workspaces if already authenticated
   if (token) {
     return <Navigate to="/workspace" replace />;
   }
@@ -20,7 +18,7 @@ const AuthPage = () => {
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
-          <Route path="*" element={<Navigate to="login" replace />} />
+          <Route path="*" element={<Login/>} />
         </Routes>
       </main>
     </div>

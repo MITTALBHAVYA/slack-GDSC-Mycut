@@ -7,7 +7,6 @@ export const fetchWorkspaces = createAsyncThunk(
     async(_,{rejectWithValue})=>{
         try{
             const response = await api.get('/workspace/');
-            console.log(response.data);
             return response.data.workspaces;
         }catch(error){
             return rejectWithValue(error.response.data);

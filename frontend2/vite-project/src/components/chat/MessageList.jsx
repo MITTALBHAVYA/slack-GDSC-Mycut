@@ -11,11 +11,8 @@ const MessageList = ({workspaceId,channelId}) => {
   const {socket} = useSocket();
   const { messages, isLoading } = useSelector((state) => state.message);
 
-  console.log("message list ", messages, "here is messages.messages", messages.messages);
-
   useEffect(() => {
     if (workspaceId && channelId) {
-      console.log("message list workspaceId : ",workspaceId, " channelId : ",channelId);
       dispatch(fetchMessages({
         workspaceId,
         channelId

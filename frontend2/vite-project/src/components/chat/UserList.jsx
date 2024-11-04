@@ -15,8 +15,7 @@ const UserList = ({ workspaceId, channelId }) => {
       setIsLoading(true);
       try {
         const response = await dispatch(fetchChannelMembers({ workspaceId, channelId })).unwrap();
-        setMembers(response.data); // Assuming `response.data` contains the members array
-        console.log("Fetched channel members:", response.data);
+        setMembers(response.data);
       } catch (error) {
         console.error('Failed to fetch channel members:', error);
       } finally {
