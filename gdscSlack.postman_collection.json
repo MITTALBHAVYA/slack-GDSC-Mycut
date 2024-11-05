@@ -1,0 +1,866 @@
+{
+	"info": {
+		"_postman_id": "6c95dc26-022d-4ffd-99b4-7b1fd66707f3",
+		"name": "gdscSlack",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33030603",
+		"_collection_link": "https://restless-eclipse-138743.postman.co/workspace/c44a7514-3270-4c7e-83a8-b28001f926c1/collection/33030603-6c95dc26-022d-4ffd-99b4-7b1fd66707f3?action=share&source=collection_link&creator=33030603"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"trial5\",\r\n    \"email\":\"trial5@gmail.com\",\r\n    \"password\":\"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"bhavya12mittal@gmail.com\",\r\n    \"password\":\"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "googleLogin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"token\":\"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/api/v1/user/google",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"google"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgotPassword",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"bhavya12mittal@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/forgot-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resetPassword",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\":\"987654321\",\r\n    \"confirmPassword\":\"987654321\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/auth/reset-password/ca7969001968d17c4389e3f2bcdfb4c681d65b1d",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password",
+								"ca7969001968d17c4389e3f2bcdfb4c681d65b1d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "changePassword",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"currentPassword\":\"987654321\",\r\n    \"newPassword\":\"123456789\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/change-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateProfile",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"\",\r\n    \"username\":\"trial6.1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "currUser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "currUserPref",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/pref",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"pref"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteUser",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "changeUserPreferences",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"theme\":\"dark\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/user/pref",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								"pref"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "workspace",
+			"item": [
+				{
+					"name": "createWorkspace",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"trialworkspace1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getWorkspaces",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateWorkspace",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"trialworkspace1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteWorkspace",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/52fc6031-cf70-43a0-a6c9-6645aa9df116",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"52fc6031-cf70-43a0-a6c9-6645aa9df116"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "channel",
+			"item": [
+				{
+					"name": "createChannel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"bhavyachannel3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllChannels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateChannel",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"bhavyachannel\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addMembersToChannel",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"emails\" : [\r\n        \"trial2@gmail.com\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteChannel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/52fc6031-cf70-43a0-a6c9-6645aa9df116/channel/d9fd3b3b-afc3-49d4-8e5a-58ec168ec7f1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"52fc6031-cf70-43a0-a6c9-6645aa9df116",
+								"channel",
+								"d9fd3b3b-afc3-49d4-8e5a-58ec168ec7f1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllMembersInChannel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeMembersFromChannel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userIds\" : [\r\n        \"6323065c-0ea9-4b85-8868-ef6fd890561f\",\r\n        \"877922ab-6e6f-43ee-9326-8e556d33e4b6\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/member",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "leaveChannel",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/leave",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"leave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateRoleOfMemberOfChannel",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newRole\":\"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/1300fb5a-5ff5-4e22-b125-e2f1841e0ecf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"1300fb5a-5ff5-4e22-b125-e2f1841e0ecf"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "message",
+			"item": [
+				{
+					"name": "sendMessage",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"here is my second message testing , for testing\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/messages/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"messages",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMessage",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/messages/6720cd615f6fb28b90d64213",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"messages",
+								"6720cd615f6fb28b90d64213"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editMessage",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"here is my beta message testing , for testing\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/messages/6720cd615f6fb28b90d64213",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"messages",
+								"6720cd615f6fb28b90d64213"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getChannelMessages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/72444cb7-d14b-4845-8277-9c702156e501/messages/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"workspace",
+								"b0dc4594-95d3-4cd5-8217-99f14e86a9b8",
+								"channel",
+								"72444cb7-d14b-4845-8277-9c702156e501",
+								"messages",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

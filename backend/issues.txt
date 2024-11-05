@@ -1,12 +1,4 @@
-can't create channel with same name in different workspace
-
-http://localhost:3000/api/v1/workspace/b0dc4594-95d3-4cd5-8217-99f14e86a9b8/channel/1c70ae4a-f48d-450f-b010-e5fa4dc5769d/
-
-http://localhost:3000/api/v1/workspace/52fc6031-cf70-43a0-a6c9-6645aa9df116/channel/d9fd3b3b-afc3-49d4-8e5a-58ec168ec7f1
-
-
 directory structure
-
 backend
 |-config
 | |-databases
@@ -64,8 +56,6 @@ const mongoConnection = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
             dbName: "gdsc_slack",
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverSelectionTimeoutMS: 5000
         });
         console.log("MongoDB connected successfully.");
@@ -227,71 +217,603 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
     JwtService.sendToken(user, 200, res, "Password reset successful");
 });
 
-//channelRoutes.js
-import express from "express";
-import {createChannel,getAllChannels,updateChannel,deleteChannel
-} from "../controllers/channelController.js";
-import { isAuthorized } from "../middleware/authMiddleware.js";
-import { isWorkspaceOwner } from "../middleware/workspaceOwner.js";
-import { checkUserRole } from "../middleware/checkUserRole.js";
-const router = express.Router({mergeParams: true});
-router.post('/', isAuthorized, isWorkspaceOwner, createChannel);
-router.get('/', isAuthorized, getAllChannels);
-router.put('/:channelId',isAuthorized,checkUserRole('owner','admin'),updateChannel);
-router.delete('/:channelId',isAuthorized,isWorkspaceOwner,deleteChannel);
-export default router;
+//channelController.js
+import Channel from "../models/channelModel.js";
+import Workspace from "../models/workspaceModel.js";
+import UserChannelRelation from "../models/userChannelRelationModel.js";
+import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
+import ErrorHandler from "../middleware/errorHandler.js";
+import User from "../models/userModel.js";
+import {Op} from 'sequelize';
+export const createChannel = catchAsyncErrors(async(req,res,next)=>{
+    const {id,owner_id} = req.workspace;
+    const workspaceId=id;
+    const {name,is_private} = req.body;
+    if(!name || name.length<3 || name.length>50){
+        return next(new ErrorHandler("Channel name must be between 3 and 50 characters",400));
+    }
+    const existingChannel = await Channel.findOne({
+        where:{
+            name,
+            workspace_id:workspaceId
+        }
+    });
+    if(existingChannel){
+        return next(new ErrorHandler("A channel with this name already exists in the workspace",400));
+    }
+    const channel = await Channel.create({name,workspace_id:workspaceId,is_private})
+    .catch(error => {
+        console.log("Error while creating channel:", error); // Debug the Sequelize error
+        return next(new ErrorHandler(error.message, 400)); // Return the actual Sequelize validation message
+    });
+    const userChannelRel = await UserChannelRelation.create({user_id:owner_id,channel_id:channel.id,role:"owner"})
+    res.status(201).json({
+        success:true,
+        message:"Channel created successfully",
+        channel,
+        userChannelRel
+    });
+});
+export const getAllChannels = catchAsyncErrors(async(req,res,next)=>{
+    const {workspaceId} = req.params;
+    const workspace_id=workspaceId;
+    const user_id = req.user.id;
+    const userChannels = await User.findAll({
+        where: {
+            id: user_id
+        },
+        include: [{
+            model: Channel,
+            as: 'UserChannels',
+            where: {
+                workspace_id
+            },
+            attributes: ['id', 'name', 'is_private', 'created_at'],
+        }],
+    });   
+    if(!userChannels || userChannels.length === 0){
+        return next(new ErrorHandler("No channels found for the user in this workspace",404));
+    }
+    const channels = userChannels.map(relation=>relation.UserChannels);
+    res.status(200).json({
+        success:true,
+        message:"All channels gathered successfully",
+        channels
+    });
+});
+export const updateChannel = catchAsyncErrors(async(req,res,next)=>{
+    const {workspaceId,channelId} = req.params;
+    const {name,is_private} = req.body;
 
-//messageRoutes.js
-import express from 'express';
-import {isAuthorized} from "../middleware/authMiddleware.js";
-import { checkUserRole } from '../middleware/checkUserRole.js';
-import {sendMessage,getChannelMessages,editMessage,deleteMessage,
-} from "../controllers/messageController.js";
-const router = express.Router({mergeParams:true});
-router.post("/",isAuthorized,checkUserRole('owner','admin','member','guest'),sendMessage);
-router.get("/",isAuthorized,checkUserRole('owner','admin','member','guest'),getChannelMessages);
-router.put("/:messageId",isAuthorized,checkUserRole('owner','admin','member','guest'),editMessage);
-router.delete("/:messageId",isAuthorized,checkUserRole('owner','admin','member','guest'),deleteMessage);
-export default router;
+    const channel = await Channel.findOne({
+        where:{id:channelId,workspace_id:workspaceId}
+    });
+    if(!channel){
+        return next(new ErrorHandler("Channel not found",404));
+    }
+    if (name && name !== channel.name) {
+        const existingChannel = await Channel.findOne({
+          where: { name, workspace_id: workspaceId },
+        });
+        if (existingChannel) {
+          return next(new ErrorHandler("Channel name already exists in this workspace", 400));
+        }
+        channel.name = name;
+      }
+      if (is_private !== undefined) {
+        channel.is_private = is_private;
+      }
+    await channel.save();
+    res.status(200).json({
+        success:true,
+        message:"Channel updated successfully",
+        channel,
+    });
+});
+export const deleteChannel = catchAsyncErrors(async (req, res, next) => {
+    const { id, owner_id } = req.workspace;
+    const workspaceId = id;
 
-//userChannelRelationRoutes.js
-import express from "express";
-import {addMembersToChannel,getAllMembersInChannel,removeMembersFromChannel,leaveChannel,updateMemberRoleInChannel} from "../controllers/userChannelRelationController.js"
-import { isAuthorized } from "../middleware/authMiddleware.js";
-import { checkUserRole } from "../middleware/checkUserRole.js";
-const router = express.Router({mergeParams: true});
-router.post("/", isAuthorized,checkUserRole('owner','admin'), addMembersToChannel);
-router.get("/", isAuthorized,checkUserRole('owner','admin','member','guest'), getAllMembersInChannel);
-router.delete("/member", isAuthorized, checkUserRole('owner','admin'),removeMembersFromChannel);
-router.delete("/leave",isAuthorized, checkUserRole('admin','member','guest'),leaveChannel);
-router.put("/:memberId", isAuthorized, checkUserRole('owner','admin'),updateMemberRoleInChannel);
-export default router;
+    const {channelId} = req.params;
+    const channel = await Channel.findOne({ where: { id: channelId, workspace_id: workspaceId } });
+    if (!channel) {
+        return next(new ErrorHandler("Channel not found in this workspace", 404));
+    }
+    await UserChannelRelation.destroy({ where: { channel_id: channelId } });
 
-//userRoutes.js
-import express from "express";
-import {changePassword, updateProfile, getCurrentUser, getCurrUserPref, deleteCurrUser, changeUserPreferences} from "../controllers/userController.js"
-import { isAuthorized } from "../middleware/authMiddleware.js";
-const router = express.Router();
-router.put('/change-password', isAuthorized, changePassword);
-router.put('/me', isAuthorized, updateProfile);
-router.get('/me', isAuthorized, getCurrentUser);
-router.delete('/me',isAuthorized,deleteCurrUser);
-router.get('/pref',isAuthorized,getCurrUserPref);
-router.put('/pref',isAuthorized,changeUserPreferences);
-export default router;
+    await channel.destroy();
 
-//workspaceRoutes.js
-import express from "express";
-import {createWorkspace, getAllWorkspaces,updateWorkspace,deleteWorkspace, getAllWorkspaces2} from "../controllers/workspaceController.js"
-import { isAuthorized } from "../middleware/authMiddleware.js";
-import { isWorkspaceOwner } from "../middleware/workspaceOwner.js";
-const router = express.Router({mergeParams: true});
-router.post("/",isAuthorized,createWorkspace);
-router.get("/",isAuthorized,getAllWorkspaces);
-router.put("/:workspaceId",isAuthorized,isWorkspaceOwner,updateWorkspace);
-router.delete("/:workspaceId",isAuthorized,isWorkspaceOwner,deleteWorkspace);
-router.get("/exper",isAuthorized,getAllWorkspaces2);
-export default router;
+    res.status(200).json({
+        success: true,
+        message: "Channel deleted successfully",
+    });
+});
+
+//messageController.js
+import { Message } from "../models/messageModel.js";
+import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
+import ErrorHandler from "../middleware/errorHandler.js";
+export const sendMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {content} = req.body;
+   const {channelId} = req.params;
+   const message = await Message.create({
+    message : content,
+    channel_id : channelId,
+    user_id : req.user.id
+   });
+   if(!message){
+      return next(new ErrorHandler("Failed to send the message",500));
+   }
+   res.status(201).json({
+    success:true,
+    message
+   });
+});
+export const getChannelMessages = catchAsyncErrors(async(req,res,next)=>{
+   const {channelId} = req.params;
+   const messages = await Message.find({channel_id:channelId})
+   .sort({timestamp:-1})
+   .limit(50);
+   res.status(200).json({
+      success: true,
+      messages: messages || []
+   });
+});
+export const editMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {messageId} = req.params;
+   const {content} = req.body;
+   if(!content || content.trim()===""){
+      return next(new ErrorHandler("Message content cannot be empty",400));
+   }
+   const message = await Message.findById(messageId);
+   if(!message){
+      return next(new ErrorHandler("Message not found",404));
+   }
+   if(message.user_id !== req.user.id){
+      return next(new ErrorHandler("Not authorized to edit this message",403));
+   }
+   message.message = content;
+   message.edited = true;
+   await message.save();
+   res.status(200).json({
+      success:true,
+      message
+   });
+});
+export const deleteMessage = catchAsyncErrors(async(req,res,next)=>{
+   const {messageId} = req.params;
+   const message = await Message.findById(messageId);
+   if(!message){
+      return next(new ErrorHandler("Message not found",404));
+   }
+   const userRole = req.userchannelrel.role;
+   if((userRole==='member' || userRole==='guest') && message.user_id !==req.user.id){
+      return next(new ErrorHandler("Not authorized to delete this message",403));
+   }
+   if(userRole==='owner' || userRole==='admin' || message.user_id === req.user.id){
+      await message.deleteOne();
+      return res.status(200).json({
+         success : true,
+         message:"Message deleted successfully"
+      });
+   }else{
+      return next(new ErrorHandler("Not authorized to delete this message",403));
+   }
+})
+
+//userChannelRelationController.js
+import Channel from "../models/channelModel.js";
+import Workspace from "../models/workspaceModel.js";
+import UserChannelRelation from "../models/userChannelRelationModel.js";
+import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
+import ErrorHandler from "../middleware/errorHandler.js";
+import User from "../models/userModel.js";
+import { Op } from "sequelize";
+export const addMembersToChannel = catchAsyncErrors(async(req,res,next)=>{
+    const {workspaceId,channelId} = req.params;
+    const {emails} = req.body;
+    const channel = await Channel.findOne({
+        where : {
+            id:channelId,
+            workspace_id:workspaceId,
+        }
+    })
+    if(!channel){
+        return next(new ErrorHandler("Channel not found",404));
+    }
+    const users = await User.findAll({
+        where:{
+            email : {
+                [Op.in]:emails,
+            }
+        },
+        attributes:['id','email','username'],
+    });
+    const foundEmails = users.map(user => user.email);
+    const invalidEmails = emails.filter(email => !foundEmails.includes(email));
+    if(invalidEmails.length>0){
+        return res.status(404).json({
+            success:false,
+            message:"Some users not found with the given emails",
+            invalidEmails:invalidEmails
+        });
+    }
+    const userChannelRelations = users.map(user=>({
+        user_id:user.id,
+        channel_id:channelId,
+        role:'member'
+    }));
+    await UserChannelRelation.bulkCreate(userChannelRelations);
+    res.status(200).json({
+        success:true,
+        message:"Members added to the channel successfully",
+        addedMembers : foundEmails
+    })
+    
+});
+export const getAllMembersInChannel = catchAsyncErrors(async (req, res, next) => {
+    const { workspaceId, channelId } = req.params;
+    const userChannelRelations = await UserChannelRelation.findAll({
+        where: {
+            channel_id: channelId
+        },
+        include: [{
+            model: User,
+            attributes: ['id', 'username', 'email'] 
+        }, {
+            model: Channel,
+            attributes: [],
+            where: {
+                workspace_id: workspaceId
+            }
+        }]
+    });
+    if (!userChannelRelations || userChannelRelations.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "No members found in this channel",
+            data: []
+        });
+    }
+    // Extract user details and role from the relations
+    const memberData = userChannelRelations.map(relation => ({
+        userId: relation.User.id,
+        username: relation.User.username,
+        email: relation.User.email,
+        role: relation.role // Access the role directly from UserChannelRelation
+    }));
+    res.status(200).json({
+        success: true,
+        message: `Found ${memberData.length} members in the channel`,
+        data: memberData
+    });
+});
+export const removeMembersFromChannel = catchAsyncErrors(async (req, res, next) => {
+    const { channelId } = req.params;
+    const { userIds } = req.body;
+    if (!userIds || userIds.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "No user IDs provided."
+        });
+    }
+    const channel = await Channel.findOne({
+        where: { id: channelId },
+        include: [{
+            model: Workspace,
+            attributes: ['owner_id']
+        }]
+    });
+    if (!channel) {
+        return res.status(404).json({
+            success: false,
+            message: "Channel not found."
+        });
+    }
+    const ownerId = channel.Workspace.owner_id;
+    if (userIds.includes(ownerId)) {
+        return res.status(400).json({
+            success: false,
+            message: "Owner cannot be removed from the channel."
+        });
+    }
+    const userChannelRelations = await UserChannelRelation.findAll({
+        where: {
+            user_id: userIds,
+            channel_id: channelId
+        }
+    });
+    if (userChannelRelations.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: "No members found in the specified channel for the given user IDs."
+        });
+    } 
+    await UserChannelRelation.destroy({
+        where: {
+            user_id: userIds,
+            channel_id: channelId
+        }
+    });
+    res.status(200).json({
+        success: true,
+        message: `Users with IDs ${userIds.join(', ')} removed from channel with ID ${channelId}.`
+    });
+});
+export const leaveChannel = catchAsyncErrors(async(req,res,next)=>{
+    const {channelId,workspaceId} = req.params;
+    const userId = req.user.id;
+    const userChannelRelation = await UserChannelRelation.findOne({
+        where:{
+            user_id:userId,
+            channel_id:channelId
+        },
+    });
+    if(!userChannelRelation){
+        return next(new ErrorHandler("User is not a member of this channel.",404));
+    }
+    await UserChannelRelation.destroy({
+        where:{
+            user_id:userId,
+            channel_id:channelId
+        }
+    })
+    res.status(200).json({
+        success: true,
+        message: `User ${userId} leave the channel successfully.`
+    });
+});
+export const updateMemberRoleInChannel = catchAsyncErrors(async(req,res,next)=>{
+    const {memberId} = req.params;
+    const {newRole} = req.body;
+    const channelId = req.userchannelrel.channel_id;
+    const roleTransition = {
+        guest : ['member','admin'],
+        member:['guest','admin'],
+        admin:['member','guest'],
+    };
+    const userChannelRelation = await UserChannelRelation.findOne({
+        where:{
+            user_id:memberId,
+            channel_id:channelId
+        },
+    });
+    if(!userChannelRelation){
+        return res.status(404).json({
+            success:false,
+            message:"Member not found in the specified channel",
+        });
+    }
+    const currentRole = userChannelRelation.role;
+    if(!roleTransition[currentRole]?.includes(newRole)){
+        return res.status(404).json({
+            success:false,
+            message:`Role transition from ${currentRole} to ${newRole} is not allowed`,
+        });
+    }
+    userChannelRelation.role = newRole;
+    await userChannelRelation.save();
+    res.status(200).json({
+        success: true,
+        message: `Role updated successfully from ${currentRole} to ${newRole}`,
+        updatedRole: userChannelRelation,
+    });
+});
+
+//userController.js
+import User from "../models/userModel.js";
+import bcrypt from 'bcrypt';
+import JwtService from '../services/jwtServices.js';
+import { catchAsyncErrors } from '../middleware/catchAsyncErrors.js';
+import ErrorHandler from '../middleware/errorHandler.js';
+import { UserPreferences } from '../models/userPreferencesModel.js';
+import moment from "moment-timezone";
+export const changePassword = catchAsyncErrors(async (req, res, next) => {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findByPk(req.user.id);
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+        return next(new ErrorHandler("Current password is incorrect", 401));
+    }
+    try {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+    } catch (error) {
+        return next(new ErrorHandler("Error hashing password", 500));
+    }
+    await user.save();
+
+    JwtService.sendToken(user, 200, res, "Password changed successfully");
+});
+export const updateProfile = catchAsyncErrors(async (req, res, next) => {
+    const { username, email } = req.body;
+    const user = await User.findByPk(req.user.id);
+    if (username) user.username = username;
+    if (email) {
+        const emailExists = await User.findOne({ where: { email } });
+        if (emailExists && emailExists.id !== user.id) {
+            return next(new ErrorHandler("Email already in use", 400));
+        }
+        user.email = email;
+    }
+    await user.save();
+    res.status(200).json({
+        success: true,
+        message: "Profile updated successfully",
+        user: {
+            id: user.id,
+            username: user.username,
+            email: user.email
+        }
+    });
+});
+export const getCurrentUser = catchAsyncErrors(async (req, res, next) => {
+    const user = await User.findByPk(req.user.id, {
+        attributes: ['id', 'username', 'email']
+    });
+    res.status(200).json({ success: true, user });
+});
+export const getCurrUserPref = catchAsyncErrors(async (req, res, next) => {
+    const user_id = req.user.id;
+    const userpref = await UserPreferences.findOne({ user_id });
+    res.status(200).json({ success: true, userpref });
+})
+export const deleteCurrUser = catchAsyncErrors(async (req, res, next) => {
+    const user_id = req.user.id;
+    const user = await User.destroy(
+        {
+            where: {
+                id: user_id,
+            }
+        }
+    );
+    const userpref = await UserPreferences.deleteOne({ user_id });
+    res.status(200).json({ success: true, user, userpref });
+});
+export const changeUserPreferences = catchAsyncErrors(async (req, res, next) => {
+    const { theme, notifications_enabled, timezone } = req.body;
+    const userId = req.user.id;
+    let userPreferences = await UserPreferences.findOne({ user_id: userId });
+    if (!userPreferences) {
+        return next(new ErrorHandler("User preferences not found", 404));
+    }
+    if (theme) {
+        if (!['light', 'dark'].includes(theme)) {
+            return next(new ErrorHandler("Invlaid theme option", 400));
+        }
+        userPreferences.theme = theme;
+    }
+    if(typeof notifications_enabled === 'boolean'){
+        userPreferences.notifications_enabled = notifications_enabled;
+    }
+    if(timezone){
+        if(!moment.tz.names().includes(timezone)){
+            return next(new ErrorHandler("Invalid Timezone",400));
+        }
+        userPreferences.timezone=timezone;
+    }
+    await userPreferences.save();
+    res.status(200).json({
+        success:true,
+        message:"User Preference Updated Successfully",
+        preferences:userPreferences
+    })
+}
+);
+
+//workspaceController.js
+import { catchAsyncErrors } from "../middleware/catchAsyncErrors.js";
+import ErrorHandler from "../middleware/errorHandler.js";
+import Workspace from "../models/workspaceModel.js";
+import Channel from "../models/channelModel.js";
+import UserChannelRelation from "../models/userChannelRelationModel.js";
+import { Op, Sequelize } from "sequelize";
+export const createWorkspace = catchAsyncErrors(async (req, res, next) => {
+    const owner_id = req.user.id;
+    const { name } = req.body;
+    if (!name || name.length < 3 || name.length > 50) {
+        return next(new ErrorHandler("Workspace name must be between 3 and 50 characters", 400));
+    }
+    const existingWorkspace = await Workspace.findOne({
+        where: { owner_id, name },
+    });
+    if (existingWorkspace) {
+        return next(new ErrorHandler("Workspace with the same name already exists", 400));
+    }
+    const workspace = await Workspace.create({ owner_id, name });
+    res.status(201).json({
+        success: true,
+        message: "Workspace created successfully",
+        workspace,
+    });
+});
+export const getAllWorkspaces2 = catchAsyncErrors(async (req, res, next) => {
+    const owner_id = req.user.id;
+    const workspaces = await Workspace.findAll({ where: { owner_id } });
+    if (!workspaces || workspaces.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "No workspaces found for this user",
+            workspaces: []
+        });
+    }
+    res.status(200).json({
+        success: true,
+        message: "All workspaces gathered successfully",
+        workspaces : workspaces
+    });
+});
+export const getAllWorkspaces = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user.id;
+    const workspaces = await Workspace.findAll({
+        where: {
+            [Op.or]: [
+                { owner_id: userId }, 
+                {
+                    id: {
+                        [Op.in]: Sequelize.literal(`(
+                             SELECT w.id FROM public."Workspaces" w 
+                             INNER JOIN public."Channels" c ON w.id = c.workspace_id
+                             INNER JOIN public."UserChannelRelations" ucr ON ucr.channel_id = c.id
+                             WHERE ucr.user_id = '${userId}'
+                        )`) 
+                    }
+                }
+            ]
+        },
+        group:['Workspace.id'],
+    });
+    if (!workspaces || workspaces.length === 0) {
+        return res.status(200).json({
+            success: true,
+            message: "No workspaces found for this user",
+            workspaces: []
+        });
+    }
+    res.status(200).json({
+        success: true,
+        message: "All workspaces gathered successfully",
+        workspaces: workspaces
+    });
+});
+export const updateWorkspace = catchAsyncErrors(async (req, res, next) => {
+    const { name } = req.body;
+    const workspaceId = req.workspace.id;
+    const owner_id = req.workspace.owner_id;
+    const workspace = await Workspace.findOne({ where: { id:workspaceId, owner_id } });
+    if (!name || name.length < 3 || name.length > 50) {
+        return next(new ErrorHandler("Workspace name must be between 3 and 50 characters", 400));
+    }
+    const existingWorkspace = await Workspace.findOne({
+        where: {
+            owner_id,
+            name,
+            id: { [Op.ne]: workspaceId }, 
+        },
+    });
+    if (existingWorkspace) {
+        return next(new ErrorHandler("Workspace with this name already exists", 400));
+    }
+    workspace.name = name;
+    await workspace.save();
+    res.status(200).json({
+        success: true,
+        message: "Workspace updated successfully",
+        data: workspace
+    });
+});
+export const deleteWorkspace = catchAsyncErrors(async (req, res, next) => {
+    const workspaceId = req.workspace.id;
+    const owner_id = req.workspace.owner_id;
+    const channels = await Channel.findAll({ where: { workspace_id: workspaceId } });
+    await UserChannelRelation.destroy({ where: { channel_id: channels.map(channel => channel.id) } });
+    await Channel.destroy({ where: { workspace_id: workspaceId} });
+    await req.workspace.destroy();
+    res.status(200).json({
+        success: true,
+        message: "Workspace and all associated channels deleted successfully",
+    });
+});
 
 //authMiddleWare.js
 import { catchAsyncErrors } from "./catchAsyncErrors.js";
@@ -876,11 +1398,9 @@ const verifyGoogleToken = async (googleToken) => {
 const authenticateWithGoogle = async (googleToken, res) => {
     const { email, name, sub: googleId } = await verifyGoogleToken(googleToken);
     let user = await User.findOne({ where: { email } });
-
     if (!user) {
         let username = name;
         let existingUser = await User.findOne({ where: { username } });
-
         while (existingUser) {
             username = `${name}${Math.floor(Math.random() * 10000)}`;
             existingUser = await User.findOne({ where: { username } });
@@ -892,17 +1412,15 @@ const authenticateWithGoogle = async (googleToken, res) => {
             password: null,
         });
     }
-
     JwtService.sendToken(user, 200, res, 'Google authentication successful');
 };
 
 export { authenticateWithGoogle };
-//jwtServices.js
 
+//jwtServices.js
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import { jwtConfig } from '../config/jwtConfig.js';
-
 class JwtService {
     // Method to generate a JWT token
     static generateToken(user) {
@@ -914,7 +1432,6 @@ class JwtService {
             throw new Error('Error generating JWT token');
         }
     }
-
     // Method to verify a JWT token
     static verifyToken(token) {
         return new Promise((resolve, reject) => {
@@ -927,23 +1444,19 @@ class JwtService {
             });
         });
     }
-
     // Method to extract the user from the token
     static async getUserFromToken(token) {
         try {
             const decoded = await this.verifyToken(token);
-            const user = await User.findByPk(decoded.id);
-            
+            const user = await User.findByPk(decoded.id); 
             if (!user) {
                 throw new Error('User not found');
             }
-
             return user;
         } catch (error) {
             throw new Error(error.message || 'Unable to retrieve user from token');
         }
     }
-
     static sendToken(user, statusCode, res, message) {
         try {
             const token = this.generateToken(user);
@@ -951,13 +1464,11 @@ class JwtService {
                 expires: new Date(Date.now() + jwtConfig.cookieExpire * 24 * 60 * 60 * 1000), 
                 httpOnly: true, 
             };
-
             const userData = {
                 id: user.id,
                 username: user.username,
                 email: user.email,
             };
-
             res.status(statusCode)
                 .cookie('token', token, options) 
                 .header('Authorization', `Bearer ${token}`) 
@@ -972,10 +1483,9 @@ class JwtService {
         }
     }
 }
-
 export default JwtService;
-//app.js
 
+//app.js
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -984,15 +1494,12 @@ import { errorMiddleware } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js'
 import channelRoutes from './routes/channelRoutes.js';
-// import messageRoutes from './routes/messageRoutes.js';
+import messageRoutes from "./routes/messageRoutes.js";
 import userChannelRelationRoutes from './routes/userChannelRelationRoutes.js'
 import workspaceRoutes from './routes/workspaceRoutes.js';
 import './models/index.js';
-
 dotenv.config();
-
 const app = express();
-
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL],
@@ -1000,25 +1507,17 @@ app.use(
     credentials: true,
   })
 );
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user',userRoutes);
 app.use('/api/v1/workspace', workspaceRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel', channelRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel/:channelId',userChannelRelationRoutes);
-// app.use('/api/v1/message', messageRoutes);
-
-// connectMDB();
-// connectPDB();
-
+app.use('/api/v1/workspace/:workspaceId/channel/:channelId/messages', messageRoutes);
 app.use(errorMiddleware); // Error handling middleware
-
 export default app;
-
 
 //server.js
 import http from 'http';
@@ -1030,30 +1529,22 @@ import mongoConnection from './config/databases/mongoconn.js';
 import JwtService from './services/jwtServices.js'
 import { Message } from './models/messageModel.js';;
 // import logger from "./utils/logger.js";
-
-
 dotenv.config(); // Load environment variables
-
 // Set up the port from environment variables or default to 5000
 const PORT = process.env.PORT || 3000;
-
 async function startServer() {
   try {
     await postgresConnection.authenticate();
     console.log("PostgreSQL connection has been established successfully");
-
     await mongoConnection();
     console.log("MongoDB connection has been established successfully");
-
     const server = http.createServer(app);
-
     const io = new SocketIOServer(server, {
       cors: {
         origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST'],
       },
     });
-
       io.use(async (socket, next) => {
         try {
           const token = socket.handshake.auth.token;
@@ -1064,26 +1555,21 @@ async function startServer() {
           next(new Error('Authentication error'));
         }
       });
-
       io.on('connection', (socket) => {
         console.log('A user connected: ', socket.id);
-  
         socket.on('joinRoom', (channelId) => {
           socket.join(channelId);
           console.log(`User ${socket.id} joined room ${channelId}`);
         });
-
       socket.on('sendMessage', async (messageData) => {
         try {
           const { channelId, message, userId } = messageData;
-          const newMessage = new Message({
+          const newMessage = await Message.create({
             message: message,
             channel_id: channelId,
             user_id: userId,
             timestamp: new Date(),
           });
-          await newMessage.save();
-
           io.to(channelId).emit('newMessage', newMessage);
         } catch (error) {
           socket.emit('error', {
@@ -1091,12 +1577,10 @@ async function startServer() {
           });
         }
       });
-
       socket.on('disconnect', () => {
         console.log(`User ${socket.id} disconnected`);
       });
     });
-
     // Start listening on the specified port
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

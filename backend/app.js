@@ -35,10 +35,6 @@ app.use('/api/v1/workspace', workspaceRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel', channelRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel/:channelId',userChannelRelationRoutes);
 app.use('/api/v1/workspace/:workspaceId/channel/:channelId/messages', messageRoutes);
-
-// connectMDB();
-// connectPDB();
-
 app.use(errorMiddleware); // Error handling middleware
 
 export default app;
