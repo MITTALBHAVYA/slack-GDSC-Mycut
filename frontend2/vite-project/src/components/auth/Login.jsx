@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, clearError } from '../../features/authSlice.js';
 import { Link, useNavigate } from 'react-router-dom';
-import NavbarSignIn from '../layout/NavbarSignIn.jsx';
+import Navbar from '../layout/Navbar.jsx';
 import { MdOutlineMailOutline } from "react-icons/md";
 import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 import PageLayout from '../layout/PageLayout.jsx';
@@ -54,7 +54,8 @@ const Login = () => {
       </div>
 
       <div className="flex items-center justify-center bg-transparent">
-        <NavbarSignIn />
+        {/* <NavbarSignIn /> */}
+        <Navbar variant='signin'/>
         <SpaceRobot2 />
         <div className="centered-container relative">
           <h1>

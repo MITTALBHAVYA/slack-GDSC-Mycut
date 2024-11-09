@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { forgotPassword } from '../../features/authSlice.js';
 import { Link } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout.jsx';
-import NavbarRegister from '../layout/NavbarRegister.jsx';
+import Navbar from '../layout/Navbar.jsx';
 import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 
 const ForgotPassword = () => {
@@ -46,7 +46,7 @@ const ForgotPassword = () => {
         />
       </div>
       <div className="flex items-center justify-center bg-transparent">
-        <NavbarRegister />
+        <Navbar variant='simple' />
         <SpaceRobot2 />
         <SpaceRobot2 />
         <div className="centered-container relative">

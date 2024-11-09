@@ -1,6 +1,5 @@
 import PageLayout from "../components/layout/PageLayout.jsx";
 import Navbar from "../components/layout/Navbar.jsx";
-// import SpaceRobot from "../components/SpaceRobot/SpaceRobot.jsx";
 import SpaceRobot2 from "../components/SpaceRobot/SpaceRobot2.jsx";
 import "./LandingPage.css";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +16,7 @@ const LandingPage = () => {
         className="upper-left-vector top-0 left-0 w-1/3 lg:w-1/5 h-[315px] bg-contain bg-no-repeat bg-top-left z-1"
         style={{ backgroundImage: 'url("/images/Vector2.png")', position:'relative' }}
       />
-      <Navbar />
+      <Navbar variant="landing"/>
       <SpaceRobot2 />
       <div className="right-side-area flex flex-col ml-[2%] mr-[2%] mt-[0%] lg:ml-[42%] lg:mr-[20%] mt-[0%] z-5 pt-0 relative">
         <div className="content max-w-[600px] mt-0 mb-[8%]">
@@ -52,7 +51,6 @@ const LandingPage = () => {
           GDSC Slack is free to try for as long as you like !
         </p>
       </div>
-      {/* <SpaceRobot/> */}
     </PageLayout>
   );
 };

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../features/authSlice.js';
 import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../layout/PageLayout.jsx';
-import NavbarRegister from '../layout/NavbarRegister.jsx';
+import Navbar from '../layout/Navbar.jsx';
 import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 import { MdErrorOutline } from 'react-icons/md';
 
@@ -59,7 +59,7 @@ const Register = () => {
         />
       </div>
       <div className="flex items-center justify-center bg-transparent">
-        <NavbarRegister />
+        <Navbar variant='simple' />
         <SpaceRobot2 />
         <div className="centered-container relative">
           <h1>
