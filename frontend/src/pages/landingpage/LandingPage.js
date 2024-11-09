@@ -40,7 +40,7 @@ const LandingPage = () => {
       <div className="upper-left-vector"></div>
       <nav className="navbar">
         <div className="logo">
-          <Link to="/">SLACK</Link>
+          <Link to="/">GDSC SLACK</Link>
         </div>
         <div className="landing-nav-func">
           <img src="./images/magnifine_glass.png" alt="MG" />

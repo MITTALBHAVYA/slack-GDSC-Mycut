@@ -1,92 +1,130 @@
 // Login.jsx
-import {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {login} from '../../features/authSlice.js';
-import {Link, useNavigate} from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, clearError } from '../../features/authSlice.js';
+import { Link, useNavigate } from 'react-router-dom';
+import NavbarSignIn from '../layout/NavbarSignIn.jsx';
+import { MdOutlineMailOutline } from "react-icons/md";
+import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
+import PageLayout from '../layout/PageLayout.jsx';
+import { MdErrorOutline } from 'react-icons/md';
 
-const Login = () =>{
-    const [email,setEmail] = useState('');
-    const [password,setPassword] = useState('');
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const {isLoading,error} = useSelector((state)=>state.auth);
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error } = useSelector((state) => state.auth);
 
-    const handleSubmit = async(e)=>{
-        e.preventDefault();
-        const result = dispatch(login({email, password}));
-        if(!result.error){
-            navigate('/workspace');
-        }
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
     };
+  }, [dispatch]);
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-md w-full space-y-8">
+  useEffect(() => {
+    const handleAuthError = () => {
+      navigate('/auth/login', { replace: true });
+    };
+    window.addEventListener('authError', handleAuthError);
+    return () => {
+      window.addEventListener('authError', handleAuthError);
+    }
+  }, [navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(login({ email, password })).unwrap();
+      if (result.token) {
+        navigate('/workspace');
+      }
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
+  };
+
+  return (
+    <PageLayout>
+      <div className="flex justify-end items-start w-full h-full">
+        <div
+          className="upper-right-vector w-1/3 lg:w-1/5 h-[310px] bg-contain bg-no-repeat bg-top-right"
+          style={{ backgroundImage: 'url("/images/Vector3.png")', position: 'relative' }}
+        />
+      </div>
+
+      <div className="flex items-center justify-center bg-transparent">
+        <NavbarSignIn />
+        <SpaceRobot2 />
+        <div className="centered-container relative">
+          <h1>
+            Sign in to GDSC SLACK
+          </h1>
+          <p>
+            We suggest using the email address that you use at work
+          </p>
+          <button className='signin-ggl-btn'>
+            <img src="/images/google_icon.png" alt='G'/>
+            <span>Sign in with Google</span>
+          </button>
+          <span className='or'>OR</span>
+          <form onSubmit={handleSubmit}>
             <div>
-              <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Sign in to your account
-              </h2>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                required
+                placeholder="name@workemail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-              <div className="rounded-md shadow-sm -space-y-px">
-                <div>
-                  <label htmlFor="email-address" className="sr-only">
-                    Email address
-                  </label>
-                  <input
-                    id="email-address"
-                    name="email"
-                    type="email"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="password" className="sr-only">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
+            <div>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center justify-center text-red-700 text-sm border border-red-300 bg-red-100 rounded-lg px-4 py-3 mt-3 shadow-md">
+                <MdErrorOutline className="text-white bg-red-500 rounded-full p-1 mr-2" size={30} />
+                <span className="font-bold">{error}</span>
               </div>
-    
-              {error && (
-                <div className="text-red-500 text-sm text-center">{error}</div>
-              )}
-    
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  {isLoading ? 'Signing in...' : 'Sign in'}
-                </button>
-              </div>
-            </form>
-    
-            <div className="text-center">
-              <Link
-                to="/register"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+            )}
+
+
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
               >
-                Don&apos;t have an account? Sign up
-              </Link>
+                <MdOutlineMailOutline />
+                <span>
+                  {isLoading ? 'Signing in...' : 'Sign in with Email'}
+                </span>
+              </button>
             </div>
+          </form>
+
+          <div>
+            <Link
+              to="/auth/forgot-password"
+            >
+              Forgot Password ? Click Here !
+            </Link>
           </div>
         </div>
-      );
+      </div>
+    </PageLayout>
+  );
 };
 
 export default Login;

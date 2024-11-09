@@ -1,0 +1,50 @@
+Pages : 
+1. Landing Page
+2. Login Page/Signin Page
+3. Sign Up/Register Page
+4. Workspace Page
+5. ChatPage
+6. NotFound Page
+7. Forgot password page+ Reset Password
+
+Forgot Password:=>
+. only gmail text field 
+. button to send the link
+
+Reset Password:=>
+. new password
+. confirm password
+
+Landing Page:=>
+. LOGO update to GDSC SLACK
+
+Login Page/Sign In page:=>
+. login with email
+. password entry field
+. forgot password link
+
+Sign Up/Register Page:=>
+. No change required
+
+Workspace Page :=>
+.alignment problem
+. half colurful and half black dark (preference)
+. create Workspace button and list of clickable workspace
+. no search bar please(i will take care of it in future)
+. list of clickable workspaces contain workspace initial as icon, workspace names, and button to enter
+.create workspace only ask for workspace name(non repeatable)
+
+ChatPage :=> 
+. chat page should also have option to jump to another workspace/or create new one
+. its side bar need to show all channel present in the workspaace, before clicking any channel , chat portion needs to have a greeting messagage "welcome to the {workspace}"
+. side bar should also have option to create new channel 
+. on clicking channel , a list of users need to be present in the channel
+. option to add new user(only email entry)
+. create new channel option should have two entry (channel name , private(boolean))
+. chat postion should be normal, user pic is not an option so as part of img their inital symbol is going to represent in the message box
+. in message input , please give basic necessaties only, send, video call, voice call, file attach, emozi+gif
+. user option , where use can change use preference and profile,
+ =>preferences (theme, notification, timezone)
+ =>profile(name, email,password)
+ where channel member names are displayed, make it clickable that open a box , showing their name , email, and role in channel and also option to change their role , or to remove the member
+. no chat search box (i will myself integreate later if required)

@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../features/authSlice.js';
 import { Link, useNavigate } from 'react-router-dom';
+import PageLayout from '../layout/PageLayout.jsx';
+import NavbarRegister from '../layout/NavbarRegister.jsx';
+import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
+import { MdErrorOutline } from 'react-icons/md';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -36,35 +40,41 @@ const Register = () => {
     e.preventDefault();
     if (validateForm()) {
       const { confirmPassword, ...registrationData } = formData;
-      let k = confirmPassword;
-      let result=k;
-      result = dispatch(register(registrationData));
-      if (!result.error) {
-        navigate('/workspaces');
+      console.log(confirmPassword);
+      const result = dispatch(register(registrationData))
+      if (!isLoading) {
+        if (!result.error) {
+          navigate('/auth/login');
+        }
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+    <PageLayout>
+      <div className="flex justify-end items-start w-full h-full">
+        <div
+          className="upper-right-vector w-1/3 lg:w-1/5 h-[310px] bg-contain bg-no-repeat bg-top-right"
+          style={{ backgroundImage: 'url("/images/Vector3.png")', position: 'relative' }}
+        />
+      </div>
+      <div className="flex items-center justify-center bg-transparent">
+        <NavbarRegister />
+        <SpaceRobot2 />
+        <div className="centered-container relative">
+          <h1>
+            SIGN UP
+          </h1>
+          <p>
+            We suggest using the email address that you use at work
+          </p>
+          <form onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="sr-only">
-                Username
-              </label>
               <input
                 id="username"
                 name="username"
                 type="text"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={formData.username}
                 onChange={handleChange}
@@ -74,15 +84,11 @@ const Register = () => {
               )}
             </div>
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={formData.email}
                 onChange={handleChange}
@@ -92,15 +98,11 @@ const Register = () => {
               )}
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
@@ -110,15 +112,11 @@ const Register = () => {
               )}
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="sr-only">
-                Confirm Password
-              </label>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -127,33 +125,36 @@ const Register = () => {
                 <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
               )}
             </div>
-          </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
+            {error && (
+              <div className="flex items-center justify-center text-red-700 text-sm border border-red-300 bg-red-100 rounded-lg px-4 py-3 mt-3 shadow-md">
+                <MdErrorOutline className="text-white bg-red-500 rounded-full p-1 mr-2" size={30} />
+                <span className="font-bold">{error}</span>
+              </div>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+              >
+                <span>
+                  {isLoading ? 'Creating account...' : 'Create account'}
+                </span>
+              </button>
+            </div>
+          </form>
 
           <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            <Link
+              to="/auth/login"
             >
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </button>
+              Already have an account? Log In
+            </Link>
           </div>
-        </form>
-
-        <div className="text-center">
-          <Link
-            to="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Already have an account? Sign in
-          </Link>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

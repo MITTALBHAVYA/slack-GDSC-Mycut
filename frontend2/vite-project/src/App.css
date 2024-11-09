@@ -1,43 +1,163 @@
-/* #App.css */
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.centered-container {
+    max-width: 30rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.centered-container>h1 {
+    margin-top: 0px;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    width: 100%;
+    font-family: 'Inter';
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.centered-container>p {
+    margin-top: 5px;
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #FFFFFF;
+    margin-bottom: 10%;
+    font-size: 16px;
+}
+
+.signin-ggl-btn {
+    overflow: hidden;
+    white-space: wrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    border-radius: 8px;
+    font-size: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    color: #000000;
+    border: 0.1em solid #FFFFFF;
+    background: #d9d9d9;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.signin-ggl-btn:hover {
+    background-color: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.signin-ggl-btn>img {
+    height: 2.1em;
+    width: 2.1em;
+    margin-right: 0.5em;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.signin-ggl-btn>span {
+    font-size: 1em;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    margin-left: 1.5em;
+    text-transform: uppercase;
+}
+
+.or {
+    font-family: 'Quicksand';
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 30px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.centered-container>form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.centered-container>form>div {
+    margin-bottom: 1rem;
+}
+
+.centered-container>form>div>input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    border-radius: 8px;
+    font-size: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    color: #000000;
+    border: 0.1em solid #FFFFFF;
+    background: #d9d9d9;
+}
+
+.centered-container>form>div>input::placeholder {
+    text-align: center;
+    color: #000000;
+    font-size: 20px;
+}
+
+.centered-container>form>div>button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    border-radius: 8px; 
+    font-size: 20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    color: #FFFFFF;
+    border: 0.1em solid #5c105e;
+    background: #4A154B;
+    transition: background-color 0.3s ease, color 0.3s ease; 
   }
-  to {
-    transform: rotate(360deg);
+  
+  .centered-container>form>div>button:hover {
+    background-color: #812a8b; 
+    color: white;
+    border-color: #812a8b;
+    text-shadow: #d9d9d9; 
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  
+  .centered-container>form>div>button>span {
+    font-size: 1em;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    text-shadow: 1px 1px 2px rgba(236, 228, 228, 0.3); 
+    margin-left: 1.5em;
+    text-transform: uppercase; 
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
+  .centered-container>div a {
+    font-family: 'Quicksand', sans-serif;
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }
+  
+  .centered-container>div a:hover,
+  .centered-container>div a:focus {
+    color: #f3ef13;
+    text-shadow: 0 2px 8px rgba(224, 173, 31, 0.5); 
+    outline: none; 
+  }
+  
+  .centered-container>div a:active {
+    color: #db6708; 
+  }
+  

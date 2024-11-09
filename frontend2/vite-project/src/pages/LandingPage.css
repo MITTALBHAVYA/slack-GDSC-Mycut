@@ -1,0 +1,33 @@
+/* External CSS */
+
+.WhiteText,
+.YelloText {
+  font-family: 'Inter', sans-serif; /* Ensuring the 'Inter' font family */
+  font-weight: bold;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3); /* Custom text shadow */
+}
+
+.connect {
+  font-family: 'Quicksand', sans-serif;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3); /* Custom text shadow */
+  font-weight: bold;
+  letter-spacing: 0.06em;
+}
+
+/* You may want to fine-tune other styles for better visuals */
+.email_signup_btn,
+.ggl_signup_btn {
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.email_signup_btn:hover,
+.ggl_signup_btn:hover {
+  transform: scale(1.05); /* Slight scale effect on hover */
+}
+
+.center-text{
+  font-family: 'Quicksand', sans-serif;
+  font-weight: bold;
+  text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.07rem;
+}

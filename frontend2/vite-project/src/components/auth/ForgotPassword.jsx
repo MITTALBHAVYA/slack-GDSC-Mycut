@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { forgotPassword } from '../../features/authSlice.js';
 import { Link } from 'react-router-dom';
+import PageLayout from '../layout/PageLayout.jsx';
+import NavbarRegister from '../layout/NavbarRegister.jsx';
+import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -31,65 +34,72 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <PageLayout>
+      <div className="flex justify-between items-start w-full h-full">
+        <div
+          className="upper-left-vector top-0 left-0 w-1/3 lg:w-1/5 h-[315px] bg-contain bg-no-repeat bg-top-left z-1"
+          style={{ backgroundImage: 'url("/images/Vector2.png")', position: 'relative' }}
+        />
+        <div
+          className="upper-right-vector w-1/3 lg:w-1/5 h-[310px] bg-contain bg-no-repeat bg-top-right"
+          style={{ backgroundImage: 'url("/images/Vector3.png")', position: 'relative' }}
+        />
+      </div>
+      <div className="flex items-center justify-center bg-transparent">
+        <NavbarRegister />
+        <SpaceRobot2 />
+        <SpaceRobot2 />
+        <div className="centered-container relative">
+          <h1>
             Reset your password
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          </h1>
+          <p>
             Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          {status.message && (
-            <div
-              className={`text-sm text-center ${
-                status.type === 'success' ? 'text-green-600' : 'text-red-600'
-              }`}
-              aria-live="polite"
-            >
-              {status.message}
+          <form onSubmit={handleSubmit}>
+            <div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
-          )}
+
+            {status.message && (
+              <div
+                className={`text-sm text-center ${status.type === 'success' ? 'text-green-600' : 'text-red-600'
+                  }`}
+                aria-live="polite"
+              >
+                {status.message}
+              </div>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+              >
+                <span>{isLoading ? 'Sending...' : 'Send reset link'}</span>
+
+              </button>
+            </div>
+          </form>
 
           <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            <Link
+              to="/auth/login"
             >
-              {isLoading ? 'Sending...' : 'Send reset link'}
-            </button>
+              Back to login
+            </Link>
           </div>
-        </form>
-
-        <div className="text-center">
-          <Link
-            to="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
-          >
-            Back to login
-          </Link>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 };
 

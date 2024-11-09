@@ -1,5 +1,8 @@
 // axios.js
 import axios from 'axios';
+import { store } from '../app/store';
+import { logout } from '../features/authSlice';
+
 const api = axios.create({
     baseURL:'http://localhost:3000/api/v1',
     withCredentials:true,
@@ -21,9 +24,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response)=>response,
     async(error)=>{
-        if(error.response.status === 401){
+        if(error.response?.status === 401){
+            store.dispatch(logout());
             localStorage.removeItem('token');
-            window.location.href='/login';
+            window.dispatchEvent(new CustomEvent('authError'));
         }
         return Promise.reject(error);
     }

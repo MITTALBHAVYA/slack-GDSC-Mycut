@@ -7,16 +7,20 @@ import AuthPage from './pages/AuthPage.jsx';
 import WorkspacePage from './pages/WorkspacePage.jsx'
 import PrivateRoute from './components/auth/PrivateRoute.jsx';
 import ChatPage from './pages/ChatPage.jsx';
+import LandingPage from './pages/LandingPage.jsx';
+import NotFound from './pages/NotFound.jsx';
+import "./App.css";
 const App = () => {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Router>
           <Routes>
+            <Route path="/" element={<LandingPage/>}/>
             <Route path='/auth/*' element={<AuthPage />} />
             <Route path='/workspace' element={<PrivateRoute><WorkspacePage /></PrivateRoute>} />
-            {/* <Route path="/workspace/:workspaceId" element={<PrivateRoute><ChannelList/></PrivateRoute>} /> */}
             <Route path='/workspace/:workspaceId/:channelId' element={<PrivateRoute><ChatPage /></PrivateRoute>}></Route>
+            <Route path='/*' element={<NotFound/>}/>
           </Routes>
         </Router>
       </PersistGate>

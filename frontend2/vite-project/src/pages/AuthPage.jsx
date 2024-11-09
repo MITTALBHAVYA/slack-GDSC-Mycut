@@ -3,25 +3,25 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
 import ForgotPassword from '../components/auth/ForgotPassword';
+import ResetPassword from '../components/auth/ResetPassword';
 import { useSelector } from 'react-redux';
+// import PageLayout from '../components/layout/PageLayout.jsx';
 
 const AuthPage = () => {
   const { token } = useSelector((state) => state.auth);
+
   if (token) {
     return <Navigate to="/workspace" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <main className="w-full max-w-md space-y-8">
-        <Routes>
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="forgot-password" element={<ForgotPassword />} />
-          <Route path="*" element={<Login/>} />
-        </Routes>
-      </main>
-    </div>
+      <Routes>
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password/:token" element={<ResetPassword />} />
+        <Route path="*" element={ <Navigate to="/auth/login" replace />} />
+      </Routes>
   );
 };
 
