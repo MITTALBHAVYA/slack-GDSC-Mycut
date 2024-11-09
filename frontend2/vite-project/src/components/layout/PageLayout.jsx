@@ -6,7 +6,6 @@ const PageLayout = ({children}) => {
         <div 
             className="bg-cover bg-center min-h-screen items-center justify-center"
             style={{backgroundImage:'url(/images/space1.jpg'}}
-            //style={{ backgroundImage: `url(${spaceImage})` }} // Using imported path
         >
             {children}
         </div>

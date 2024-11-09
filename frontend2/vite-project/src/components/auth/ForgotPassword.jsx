@@ -1,5 +1,6 @@
 // ForgotPassword.jsx
 import { useState } from 'react';
+import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { forgotPassword } from '../../features/authSlice.js';
 import { Link } from 'react-router-dom';
@@ -71,13 +72,19 @@ const ForgotPassword = () => {
 
             {status.message && (
               <div
-                className={`text-sm text-center ${status.type === 'success' ? 'text-green-600' : 'text-red-600'
-                  }`}
+                className={`flex items-center justify-center ${status.type === 'success' ? 'text-green-700 border-green-300 bg-green-100' : 'text-red-700 border-red-300 bg-red-100'
+                  } text-sm border rounded-lg px-4 py-3 mt-3 shadow-md`}
                 aria-live="polite"
               >
-                {status.message}
+                {status.type === 'success' ? (
+                  <MdCheckCircle className="text-white bg-green-500 rounded-full p-1 mr-2" size={30} />
+                ) : (
+                  <MdErrorOutline className="text-white bg-red-500 rounded-full p-1 mr-2" size={30} />
+                )}
+                <span className="font-bold">{status.message}</span>
               </div>
             )}
+
 
             <div>
               <button

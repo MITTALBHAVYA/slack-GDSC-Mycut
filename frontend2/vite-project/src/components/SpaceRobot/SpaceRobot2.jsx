@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import './SpaceRobot2.css';
 import FloatingRobotImage from '../SpaceRobot/FloatingRobot.png';
 
-const SpaceRobot2 = () => {
-    const [position, setPosition] = useState({ top: '20%', left: '20%' });
+const SpaceRobot2 = ({top='20%',left='20%',delay=12}) => {
+    const [position, setPosition] = useState({ top, left });
     const [wsize] = useState('15%');
     const [hsize] = useState('40%')
     const [rotation, setRotation] = useState(0);
@@ -50,10 +51,10 @@ const SpaceRobot2 = () => {
     useEffect(() => {
         const delayStartAnimation = setTimeout(() => {
             setIsAnimating(true); 
-        }, 12000);
+        }, delay*1000);
 
         return () => clearTimeout(delayStartAnimation);
-    }, []); // Empty dependency array to run only once on mount
+    }, [delay]); // Empty dependency array to run only once on mount
 
     useEffect(() => {
         if (isAnimating) {
@@ -154,6 +155,11 @@ const SpaceRobot2 = () => {
             {isDragging && <div className="drag-indicator" />}
         </div>
     );
+};
+SpaceRobot2.propTypes = {
+    top: PropTypes.string,
+    left: PropTypes.string,
+    delay: PropTypes.number
 };
 
 export default SpaceRobot2;

@@ -181,6 +181,10 @@
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
 
+.gdsclogolink > img:hover {
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
 
 .signuplink {
     font-family: 'Quicksand', sans-serif;

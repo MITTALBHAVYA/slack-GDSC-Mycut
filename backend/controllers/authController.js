@@ -84,7 +84,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     const delPrev = await PasswordReset.deleteMany({user_id});
     const passwordResetData = await PasswordReset.create({ user_id, resetPasswordToken, resetPasswordExpire });
     const emailSubject = `Password Reset Request`;
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password/${resetToken}`;
     const emailMessage = `You requested a password reset. Click here to reset your password: ${resetUrl}\n\n If you did not request this, please ignore this email.`;
 
     try {
