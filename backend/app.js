@@ -11,6 +11,8 @@ import channelRoutes from './routes/channelRoutes.js';
 import messageRoutes from "./routes/messageRoutes.js";
 import userChannelRelationRoutes from './routes/userChannelRelationRoutes.js'
 import workspaceRoutes from './routes/workspaceRoutes.js';
+import session from 'express-session';
+import passport from "./config/passport.js";
 import './models/index.js';
 
 dotenv.config();
@@ -19,7 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
+    origin: [process.env.FRONTEND_URL,"https://accounts.google.com"],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
@@ -28,6 +30,15 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave:false,
+  saveUninitialized:true
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user',userRoutes);

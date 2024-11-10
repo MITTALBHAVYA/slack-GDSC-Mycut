@@ -1,6 +1,6 @@
 //authController.js
 import User from "../models/userModel.js";
-import {UserPreferences} from "../models/userPreferencesModel.js"
+import { UserPreferences } from "../models/userPreferencesModel.js"
 import bcrypt from 'bcrypt';
 import JwtService from '../services/jwtServices.js';
 import { authenticateWithGoogle } from '../services/googleAuthServices.js';
@@ -13,43 +13,32 @@ import { PasswordReset } from "../models/passwordResetModel.js";
 export const register = catchAsyncErrors(async (req, res, next) => {
     const { username, email, password } = req.body;
 
-        const existingUser = await User.findOne({ where: { email } });
-        if (existingUser) {
-            return next(new ErrorHandler("User already exists with this email", 400));
-        }
-        const user = await User.create({ username, email, password });
-        const user_id = user.id;
-        const userPref = await UserPreferences.create({user_id});
-        const token = JwtService.generateToken(user);
-        JwtService.sendToken(user, 201, res, "User registered successfully");
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+        return next(new ErrorHandler("User already exists with this email", 400));
+    }
+    const user = await User.create({ username, email, password });
+    const user_id = user.id;
+    const userPref = await UserPreferences.create({ user_id });
+    const token = JwtService.generateToken(user);
+    JwtService.sendToken(user, 201, res, "User registered successfully");
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
     const { email, password } = req.body;
-        const user = await User.findOne({ where: { email } });
-        if (!user) {
-            return next(new ErrorHandler("Invalid email or password", 401));
-        }
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+    }
 
-        const isPasswordValid = await user.comparePassword(password);
-        if (!isPasswordValid) {
-            return next(new ErrorHandler("Invalid email or password", 401));
-        }
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+        return next(new ErrorHandler("Invalid email or password", 401));
+    }
 
-        const token = JwtService.generateToken(user);
+    const token = JwtService.generateToken(user);
 
-        JwtService.sendToken(user, 200, res, "Login successful");
-});
-
-export const googleLogin = catchAsyncErrors(async (req, res, next) => {
-    const { token } = req.body;
-
-        const { user, token: jwtToken } = await authenticateWithGoogle(token);
-
-        if (!user) {
-            return next(new ErrorHandler("Google authentication failed", 400));
-        }
-        JwtService.sendToken(user, 200, res, "Google login successful");
+    JwtService.sendToken(user, 200, res, "Login successful");
 });
 
 export const logout = catchAsyncErrors(async (req, res, next) => {
@@ -73,7 +62,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     if (!user) {
         return next(new ErrorHandler("User not found with this email", 404));
     }
-    const {id} = user;
+    const { id } = user;
     const resetToken = crypto.randomBytes(20).toString('hex');
     const resetPasswordToken = crypto
         .createHash('sha256')
@@ -81,7 +70,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
         .digest('hex');
     const resetPasswordExpire = Date.now() + 15 * 60 * 1000;
     const user_id = id;
-    const delPrev = await PasswordReset.deleteMany({user_id});
+    const delPrev = await PasswordReset.deleteMany({ user_id });
     const passwordResetData = await PasswordReset.create({ user_id, resetPasswordToken, resetPasswordExpire });
     const emailSubject = `Password Reset Request`;
     const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password/${resetToken}`;
@@ -126,7 +115,7 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
         resetPasswordToken,
         resetPasswordExpire: { $gt: Date.now() }
     });
-    
+
     if (!passwordResetData) {
         return next(new ErrorHandler("Password reset token is invalid or has expired", 400));
     }
@@ -150,3 +139,4 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     JwtService.sendToken(user, 200, res, "Password reset successful");
 });
+

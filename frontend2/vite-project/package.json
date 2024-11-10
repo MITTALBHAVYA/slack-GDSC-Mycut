@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.1.9",
     "@heroicons/react": "^2.1.5",
+    "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.2.7",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",

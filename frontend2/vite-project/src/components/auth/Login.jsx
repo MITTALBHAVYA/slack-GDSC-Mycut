@@ -9,6 +9,7 @@ import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 import PageLayout from '../layout/PageLayout.jsx';
 import { MdErrorOutline } from 'react-icons/md';
 
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,6 +45,10 @@ const Login = () => {
     }
   };
 
+  const loginWithGoogle = ()=>{
+    window.open(`http://localhost:3000/api/v1/auth/google/callback`,"_self")
+}
+
   return (
     <PageLayout>
       <div className="flex justify-end items-start w-full h-full">
@@ -64,7 +69,7 @@ const Login = () => {
           <p>
             We suggest using the email address that you use at work
           </p>
-          <button className='signin-ggl-btn'>
+          <button className='signin-ggl-btn' onClick={loginWithGoogle}>
             <img src="/images/google_icon.png" alt='G'/>
             <span>Sign in with Google</span>
           </button>
