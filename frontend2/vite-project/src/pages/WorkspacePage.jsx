@@ -9,7 +9,7 @@ import { fetchWorkspaces} from '../features/workspaceSlice.js';
 const WorkspacePage = () => {
   const dispatch = useDispatch();
   const { workspaces, isLoading, error } = useSelector((state) => state.workspace);
-
+  console.log('Workspaces : ',workspaces);
   useEffect(() => {
     dispatch(fetchWorkspaces());
   }, [dispatch]);

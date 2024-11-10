@@ -9,7 +9,10 @@ const LandingPage = () => {
   const handleEmailSignup = ()=>{
     navigate('/auth/register');
   }
-  
+  const loginWithGoogle = () => {
+    const VITE_API_URL = import.meta.env.VITE_API_URL;
+    window.open(`${VITE_API_URL}/auth/google/callback`, "_self");
+  }
   return (
     <PageLayout>
       <div
@@ -37,7 +40,7 @@ const LandingPage = () => {
               SIGN UP WITH EMAIL ADDRESS
             </span>
           </button>
-          <button className="ggl_signup_btn overflow-hidden whitespace-wrap py-3 px-5 border-none cursor-pointer w-full lg:w-[18vw] h-auto flex items-center justify-center text-center rounded-[0.25em] bg-[#FFB409] text-black hover:bg-[#3498db] hover:text-white">
+          <button className="ggl_signup_btn overflow-hidden whitespace-wrap py-3 px-5 border-none cursor-pointer w-full lg:w-[18vw] h-auto flex items-center justify-center text-center rounded-[0.25em] bg-[#FFB409] text-black hover:bg-[#3498db] hover:text-white" onClick={loginWithGoogle}>
             <img src='./images/google_icon.png' alt='G' className='gimg mr-3 h-6 w-6 lg:h-8 lg:w-8 rounded-sm' />
             <span className="font-bold font-inter text-base lg:text-lg">
               SIGN UP WITH GOOGLE

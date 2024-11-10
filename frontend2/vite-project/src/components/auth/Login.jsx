@@ -45,8 +45,9 @@ const Login = () => {
     }
   };
 
-  const loginWithGoogle = ()=>{
-    window.open(`http://localhost:3000/api/v1/auth/google/callback`,"_self")
+const loginWithGoogle = () => {
+  const VITE_API_URL = import.meta.env.VITE_API_URL;
+  window.open(`${VITE_API_URL}/auth/google/callback`, "_self");
 }
 
   return (

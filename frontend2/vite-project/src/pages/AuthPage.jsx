@@ -4,6 +4,7 @@ import Login from '../components/auth/Login';
 import Register from '../components/auth/Register';
 import ForgotPassword from '../components/auth/ForgotPassword';
 import ResetPassword from '../components/auth/ResetPassword';
+import GoogleAuthTemp from '../components/auth/GoogleAuthTemp';
 import { useSelector } from 'react-redux';
 // import PageLayout from '../components/layout/PageLayout.jsx';
 
@@ -18,6 +19,7 @@ const AuthPage = () => {
       <Routes>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="google/callback" element={<GoogleAuthTemp/>}/>
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route path="*" element={ <Navigate to="/auth/login" replace />} />

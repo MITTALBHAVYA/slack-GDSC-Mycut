@@ -39,7 +39,6 @@ backend
 | |-workspaceRoutes.js
 |-services
 | |-EmailService.js
-| |-googleAuthServices.js
 | |-jwtServices.js
 |-.env
 |-.gitignore
