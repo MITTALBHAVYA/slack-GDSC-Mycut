@@ -3,7 +3,6 @@ import User from "../models/userModel.js";
 import { UserPreferences } from "../models/userPreferencesModel.js"
 import bcrypt from 'bcrypt';
 import JwtService from '../services/jwtServices.js';
-import { authenticateWithGoogle } from '../services/googleAuthServices.js';
 import { catchAsyncErrors } from '../middleware/catchAsyncErrors.js';
 import ErrorHandler from '../middleware/errorHandler.js';
 import EmailService from "../services/EmailService.js";
@@ -37,7 +36,7 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     }
 
     const token = JwtService.generateToken(user);
-
+    console.log("user => ",user);
     JwtService.sendToken(user, 200, res, "Login successful");
 });
 
