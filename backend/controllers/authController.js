@@ -36,7 +36,6 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     }
 
     const token = JwtService.generateToken(user);
-    console.log("user => ",user);
     JwtService.sendToken(user, 200, res, "Login successful");
 });
 

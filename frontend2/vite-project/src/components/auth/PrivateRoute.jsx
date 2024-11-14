@@ -9,8 +9,11 @@ const PrivateRoute = ({ children }) => {
   if(token){
     try{
       const decodedToken = jwtDecode(token);
+      console.log("Decoded token: ",decodedToken);
       const currentTime = Date.now()/1000;
+      
       if(decodedToken.exp < currentTime){
+        console.log("Token expired. Logging out...");
         localStorage.removeItem('token');
         return <Navigate to="/auth/login" replace/>;
       }

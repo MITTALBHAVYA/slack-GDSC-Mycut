@@ -199,3 +199,33 @@
     color: #FFFFFF;
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 }
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; 
+    height: 3.5rem;
+    width: 3.5rem;
+    font-size: 2.5rem;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    border: 0.1em solid #5c105e;
+    background: #4A154B;
+    transition: background-color 0.3s ease, color 0.3s ease; 
+  }
+  
+  .profile-link:hover {
+    background-color: #812a8b; 
+    color: white;
+    border-color: #812a8b;
+    text-shadow: #d9d9d9; 
+  }
+  
+  .profile-link>span {
+    font-family: 'Quicksand', sans-serif;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }

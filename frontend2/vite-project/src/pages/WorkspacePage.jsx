@@ -1,15 +1,17 @@
 // WorkspacePage.jsx
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Header from '../components/layout/Header.jsx';
+// import Header from '../components/layout/Header.jsx';
 import WorkspaceList from '../components/workspace/WorkspaceList.jsx';
-import { fetchWorkspaces} from '../features/workspaceSlice.js';
+import { fetchWorkspaces } from '../features/workspaceSlice.js';
+import Navbar from '../components/layout/Navbar.jsx';
+import PageLayout from '../components/layout/PageLayout.jsx';
 
 
 const WorkspacePage = () => {
   const dispatch = useDispatch();
   const { workspaces, isLoading, error } = useSelector((state) => state.workspace);
-  console.log('Workspaces : ',workspaces);
+  console.log('Workspaces : ', workspaces);
   useEffect(() => {
     dispatch(fetchWorkspaces());
   }, [dispatch]);
@@ -38,8 +40,9 @@ const WorkspacePage = () => {
   }
 
   return (
+    <PageLayout>
     <div className="h-screen flex flex-col">
-      <Header />
+      <Navbar variant='workspace' />
       <div className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">Your Workspaces</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -47,6 +50,7 @@ const WorkspacePage = () => {
         </div>
       </div>
     </div>
+    </PageLayout>
   );
 };
 

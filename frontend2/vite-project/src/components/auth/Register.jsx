@@ -40,7 +40,7 @@ const Register = () => {
     e.preventDefault();
     if (validateForm()) {
       const { confirmPassword, ...registrationData } = formData;
-      console.log(confirmPassword);
+      console.log("Confirm password : ", confirmPassword);
       const result = dispatch(register(registrationData))
       if (!isLoading) {
         if (!result.error) {

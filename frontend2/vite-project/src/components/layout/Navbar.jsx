@@ -1,10 +1,25 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../features/authSlice';
 
 const Navbar = ({ variant = 'simple' }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const user = useSelector((state) => state.auth.user);
+  const authLoading = useSelector((state) => state.auth.loading);
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to logout?')) {
+      dispatch(logout());
+      navigate('/auth/login');
+    }
+  };
+
   const [menuOpen, setMenuOpen] = useState(false);
 
   const Logo = () => (
@@ -23,18 +38,10 @@ const Navbar = ({ variant = 'simple' }) => {
       case 'signin':
         return (
           <div className="hidden lg:flex flex-col items-center space-x-8">
-            <span
-              className="text-white font-bold tracking-wider"
-              style={{
-                fontFamily: 'Quicksand, sans-serif',
-                letterSpacing: '0.6px'
-              }}
-            >
+            <span className="text-white font-bold tracking-wider" style={{ fontFamily: 'Quicksand, sans-serif', letterSpacing: '0.6px' }}>
               New to Slack?
             </span>
-            <Link to="/auth/register" className="signuplink">
-              Create an account
-            </Link>
+            <Link to="/auth/register" className="signuplink">Create an account</Link>
           </div>
         );
       case 'landing':
@@ -44,12 +51,23 @@ const Navbar = ({ variant = 'simple' }) => {
               <FaSearch className="w-6 h-6 lg:w-8 lg:h-8 mr-3 lg:mr-4" />
               <span className="text-shadow-md text-lg lg:text-2xl">Explore</span>
             </Link>
-            <Link
-              to="/auth/login"
-              className="border-4 border-white text-white rounded-lg px-6 py-3 lg:px-8 lg:py-4 font-bold text-lg lg:text-2xl hover:bg-blue-500 hover:text-white transition duration-300"
-            >
+            <Link to="/auth/login" className="border-4 border-white text-white rounded-lg px-6 py-3 lg:px-8 lg:py-4 font-bold text-lg lg:text-2xl hover:bg-blue-500 hover:text-white transition duration-300">
               SIGN IN
             </Link>
+          </div>
+        );
+      case 'workspace':
+        return (
+          <div className="hidden lg:flex items-center space-x-8">
+            <Link to="#" className='profile-link'>
+              <span>{authLoading ? 'Loading user...' : (user?.username[0] || '@')}</span>
+            </Link>
+            <button
+              className="border-4 border-white text-white rounded-lg px-6 py-3 lg:px-8 lg:py-4 font-bold text-lg lg:text-2xl hover:bg-red-500 hover:text-white transition duration-300"
+              onClick={handleLogout}
+            >
+              LOGOUT
+            </button>
           </div>
         );
       default:
@@ -68,7 +86,7 @@ const Navbar = ({ variant = 'simple' }) => {
           return (
             <Link
               to="/auth/register"
-              className="text-white text-xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="text-white text-xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105"
               onClick={() => setMenuOpen(false)}
             >
               Create an account
@@ -79,20 +97,35 @@ const Navbar = ({ variant = 'simple' }) => {
             <>
               <Link
                 to="/explore"
-                className="text-white text-2xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="text-white text-2xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105"
                 onClick={() => setMenuOpen(false)}
-                aria-label="Explore"
               >
                 Explore
               </Link>
               <Link
                 to="/auth/login"
-                className="text-white text-2xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="text-white text-2xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105"
                 onClick={() => setMenuOpen(false)}
-                aria-label="Sign In"
               >
                 Sign In
               </Link>
+            </>
+          );
+        case 'workspace':
+          return (
+            <>
+              <Link to="#" className="text-white text-xl font-semibold py-4 px-8 rounded-md hover:text-blue-400 transition duration-300 transform hover:scale-105">
+                {authLoading ? 'Loading user...' : (user?.username.toUpperCase() || 'Guest')}
+              </Link>
+              <button
+                className="text-white text-xl font-semibold py-4 px-8 rounded-md hover:text-red-400 transition duration-300 transform hover:scale-105"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLogout();
+                }}
+              >
+                Logout
+              </button>
             </>
           );
         default:
@@ -128,7 +161,7 @@ const Navbar = ({ variant = 'simple' }) => {
 };
 
 Navbar.propTypes = {
-  variant: PropTypes.oneOf(['simple', 'signin', 'landing']),
+  variant: PropTypes.oneOf(['simple', 'signin', 'landing', 'workspace']),
 };
 
 export default Navbar;
