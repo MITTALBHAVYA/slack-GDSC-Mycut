@@ -16,6 +16,7 @@ import passport from 'passport';
 import { Strategy as OAuth2Strategy } from 'passport-google-oauth20';
 import User from './models/userModel.js';
 import JwtService from './services/jwtServices.js';
+import { UserPreferences } from './models/userPreferencesModel.js';
 // import passport from "./config/passport.js";
 import './models/index.js';
 
@@ -108,13 +109,21 @@ app.get("/api/v1/auth/google/callback",
     failureRedirect: `${process.env.FRONTEND_URL}/auth/login`
   }), 
   (req, res) => {
-    const token =req.user.token;
+    const token = req.user.token;
+    const userData = {
+      id:req.user.id,
+      username: req.user.username,
+      email: req.user.email
+    };
 
+    // Set the token as a cookie
     res.cookie('token', token, { httpOnly: true, secure: true });
 
+    // Set the token in the Authorization header
     res.setHeader('Authorization', `Bearer ${token}`);
 
-    res.redirect(`${process.env.FRONTEND_URL}/auth/google/callback?token=${token}`);
+    // Redirect to frontend callback with token and userData
+    res.redirect(`${process.env.FRONTEND_URL}/auth/google/callback?token=${encodeURIComponent(token)}&userData=${encodeURIComponent(JSON.stringify(userData))}`);
   }
 );
 
