@@ -5,6 +5,7 @@ import { FaSearch } from 'react-icons/fa';
 import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/authSlice';
+import UserProfilePopup from '../workspace/UserProfilePopUp.jsx'; 
 
 const Navbar = ({ variant = 'simple' }) => {
   const dispatch = useDispatch();
@@ -12,6 +13,8 @@ const Navbar = ({ variant = 'simple' }) => {
 
   const user = useSelector((state) => state.auth.user);
   const authLoading = useSelector((state) => state.auth.loading);
+
+  const [isProfileOpen,setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -59,9 +62,10 @@ const Navbar = ({ variant = 'simple' }) => {
       case 'workspace':
         return (
           <div className="hidden lg:flex items-center space-x-8">
-            <Link to="#" className='profile-link'>
+            <button onClick={()=>setIsProfileOpen(!isProfileOpen)} className='profile-link'>
               <span>{authLoading ? 'Loading user...' : (user?.username[0] || '@')}</span>
-            </Link>
+            </button>
+            <UserProfilePopup user={user} isOpen={isProfileOpen} onClose={()=>setIsProfileOpen(false)}/>
             <button
               className="border-4 border-white text-white rounded-lg px-6 py-3 lg:px-8 lg:py-4 font-bold text-lg lg:text-2xl hover:bg-red-500 hover:text-white transition duration-300"
               onClick={handleLogout}
