@@ -1,7 +1,7 @@
 // CreateWorkspace.jsx
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { createWorkspace,fetchWorkspaces } from '../../features/workspaceSlice.js';
+import { createWorkspace} from '../../features/workspaceSlice.js';
 // import { Plus } from 'lucide-react';
 
 const CreateWorkspace = () => {
@@ -22,8 +22,7 @@ const CreateWorkspace = () => {
     setError('');
 
     try {
-      dispatch(createWorkspace({ name })).unwrap();
-      dispatch(fetchWorkspaces());
+      await dispatch(createWorkspace({ name })).unwrap();
       setName(''); 
       setShowModal(false);
     } catch (err) {
@@ -43,7 +42,7 @@ const CreateWorkspace = () => {
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-10">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">
             <h2 className="text-lg font-semibold mb-4">Create a new Workspace</h2>
             <form onSubmit={handleSubmit}>

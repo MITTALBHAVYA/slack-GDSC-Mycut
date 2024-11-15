@@ -52,8 +52,20 @@ const workspaceSlice = createSlice({
             state.isLoading=false;
             state.workspaces=action.payload?.message || 'Failed to fetch workspaces';
         })
+        .addCase(createWorkspace.pending,(state)=>{
+            state.isLoading = true;
+            state.error=null;
+        })
         .addCase(createWorkspace.fulfilled,(state,action)=>{
-            state.workspaces.push(action.payload);
+            state.isLoading = false;
+            if(action.payload.success && action.payload.workspace){
+                state.workspaces.push(action.payload.workspace);
+            }
+            state.error=null;
+        })
+        .addCase(createWorkspace.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.error=action.payload?.message || 'Failed to create workspace'
         });
     },
 });
