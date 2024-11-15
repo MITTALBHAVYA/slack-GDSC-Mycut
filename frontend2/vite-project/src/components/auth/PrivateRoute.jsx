@@ -9,7 +9,6 @@ const PrivateRoute = ({ children }) => {
   if(token){
     try{
       const decodedToken = jwtDecode(token);
-      console.log("Decoded token: ",decodedToken);
       const currentTime = Date.now()/1000;
       
       if(decodedToken.exp < currentTime){

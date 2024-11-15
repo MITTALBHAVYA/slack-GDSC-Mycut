@@ -2,7 +2,8 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import Header from '../components/layout/Header.jsx';
-import WorkspaceList from '../components/workspace/WorkspaceList.jsx';
+import WorkspaceList from '../components/workspace/WorkspaceList2.jsx';
+import CreateWorkspace from '../components/workspace/CreateWorkspace2.jsx';
 import { fetchWorkspaces } from '../features/workspaceSlice.js';
 import Navbar from '../components/layout/Navbar.jsx';
 import PageLayout from '../components/layout/PageLayout.jsx';
@@ -41,15 +42,27 @@ const WorkspacePage = () => {
 
   return (
     <PageLayout>
-    <div className="h-screen flex flex-col">
-      <Navbar variant='workspace' />
-      <div className="flex-1 p-6">
-        <h2 className="text-2xl font-bold mb-4">Your Workspaces</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <WorkspaceList workspaces={workspaces} />
+      <div className="flex flex-col relative bg-transparent">
+        <Navbar variant='workspace' />
+        <div className="flex-1 p-6 mt-[8rem]">
+          <div className='flex flex-col ml-[2%] mr-[2%] mt-[0%] lg:ml-[5%] lg:mr-[40%] mt-[0%] pt-0 relative'>
+            <h1 className="WhiteText text-white text-3xl sm:text-4xl md:text-5xl -mt-8 mb-[2rem]">Create a new GDSC Slack workspace</h1>
+            <p className="connect text-white text-lg sm:text-xl md:text-2xl font-bold tracking-wide"> Gdsc Slack gives your team a home - a place where they can talk and work together. To create a new fetchWorkspaces, click on the button below</p>
+          </div>
+          <div className='flex items-center justify-center bg-transparent'>
+            <div className=' centered-container mt-[2rem] relative'>
+              <div className='flex flex-col items-center justify-center mb-[10%]'>
+                <CreateWorkspace />
+                <img src="/images/FloatingRobot.png" alt="floatingrobot" className='workspacebot w-[6rem]' />
+              </div>
+              <div className='w-full flex flex-col items-center justify-center'>
+                <p className='opnwksp'>Open a workspace</p>
+                <WorkspaceList workspaces={workspaces} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
     </PageLayout>
   );
 };

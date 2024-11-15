@@ -1,7 +1,6 @@
 import PageLayout from "../components/layout/PageLayout.jsx";
 import Navbar from "../components/layout/Navbar.jsx";
 import SpaceRobot2 from "../components/SpaceRobot/SpaceRobot2.jsx";
-import "./LandingPage.css";
 import { useNavigate } from "react-router-dom";
 const LandingPage = () => {
   const navigate = useNavigate();
