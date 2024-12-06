@@ -5,7 +5,8 @@ import { FaSearch } from 'react-icons/fa';
 import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/authSlice';
-import UserProfilePopup from '../workspace/UserProfilePopUp.jsx'; 
+import Logo from '../ui/Logo.jsx';
+import UserProfilePopup from '../ui/UserProfilePopUp.jsx'; 
 
 const Navbar = ({ variant = 'simple' }) => {
   const dispatch = useDispatch();
@@ -13,8 +14,6 @@ const Navbar = ({ variant = 'simple' }) => {
 
   const user = useSelector((state) => state.auth.user);
   const authLoading = useSelector((state) => state.auth.loading);
-
-  const [isProfileOpen,setIsProfileOpen] = useState(false);
 
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {
@@ -24,15 +23,6 @@ const Navbar = ({ variant = 'simple' }) => {
   };
 
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const Logo = () => (
-    <div className="gdscslacklogo text-white font-bold tracking-wider ml-6 flex items-center">
-      <Link to="/" className="text-shadow-md text-3xl lg:text-3xl flex items-center gdsclogolink">
-        <img src="/images/logo.png" alt="G" className="logo-image w-12 h-12" />
-        GDSC SLACK
-      </Link>
-    </div>
-  );
 
   const DesktopNav = () => {
     switch (variant) {
@@ -62,10 +52,7 @@ const Navbar = ({ variant = 'simple' }) => {
       case 'workspace':
         return (
           <div className="hidden lg:flex items-center space-x-8">
-            <button onClick={()=>setIsProfileOpen(!isProfileOpen)} className='profile-link'>
-              <span>{authLoading ? 'Loading user...' : (user?.username[0] || '@')}</span>
-            </button>
-            <UserProfilePopup user={user} isOpen={isProfileOpen} onClose={()=>setIsProfileOpen(false)}/>
+            <UserProfilePopup/>
             <button
               className="border-4 border-white text-white rounded-lg px-6 py-3 lg:px-8 lg:py-4 font-bold text-lg lg:text-2xl hover:bg-red-500 hover:text-white transition duration-300"
               onClick={handleLogout}

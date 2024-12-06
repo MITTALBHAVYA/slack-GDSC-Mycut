@@ -8,12 +8,12 @@ import { ArrowRightCircle, Search } from 'lucide-react';
 import { useState } from 'react';
 
 const WorkspaceList = ({ workspaces }) => {
-    const dispatch = useDispatch(); // Initialize dispatch
+    const dispatch = useDispatch(); 
     const navigate = useNavigate();
     const user = useSelector((state) => state.auth.user);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    //user have name, email, id
+
     const handleWorkspaceClick = (workspace) => {
         dispatch(setCurrentWorkspace(workspace));
         dispatch(setCurrentChannel(null));
@@ -30,9 +30,7 @@ const WorkspaceList = ({ workspaces }) => {
                         workspaces for {user.email}
                     </p>
                 </div>
-
                 <hr className="w-full h-1 bg-gray-200" />
-
                 <div className="flex-1 overflow-y-auto w-full no-scrollbar">
                     {workspaces.length === 0 ? (
                         <div className="p-4 text-gray-500">{(isSearchFocused && searchTerm.length >= 4) ? "No matching found" : "No workspaces available"}</div>
@@ -68,12 +66,11 @@ const WorkspaceList = ({ workspaces }) => {
                             onBlur={() => setIsSearchFocused(false)}
                             className="w-full px-3 py-2 bg-transparent focus:outline-none text-gray-700 border border-transparent hover:border-gray-200"
                         />
-
                     </div>
                 </div>
                 {isSearchFocused && searchTerm.length > 0 && searchTerm.length < 4 && (
-                    <p className='text-sm text-gray-500 mt-1 ml-2'>
-                        Pleae type at least 4 characters to search
+                    <p className='text-[1.5rem] text-[#fd7606] mt-1 ml-2'>
+                        Please type at least 4 characters to search
                     </p>
                 )}
             </div>
