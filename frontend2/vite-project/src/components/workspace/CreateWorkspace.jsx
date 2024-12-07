@@ -37,7 +37,7 @@ const CreateWorkspace = () => {
     <>
       <button 
         onClick={() => setShowModal(true)}
-        className="w-10 h-10 rounded-lg flex items-center justify-center text-white mb-2 bg-gray-700 hover:bg-gray-600"
+        className="w-10 h-10 rounded-lg flex items-center justify-center text-white bg-gray-700 hover:bg-gray-600"
         aria-label="Create a new workspace"
       >
         <Plus size={20} />

@@ -57,7 +57,7 @@ const UserProfilePopup = () => {
     <div className="relative">
       <button
         ref={buttonRef}
-        className="w-14 h-14 bg-gradient-to-br from-[#41278a] to-[#81298d]  text-white 
+        className="w-12 h-12 bg-gradient-to-br from-[#41278a] to-[#81298d]  text-white 
         border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 
         rounded-full flex items-center justify-center 
         transform hover:scale-105 active:scale-95 

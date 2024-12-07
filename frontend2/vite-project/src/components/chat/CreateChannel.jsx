@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createChannel } from '../../features/channelSlice';
 import {XIcon } from 'lucide-react';
 
-export const CreateChannel = ({ onClose }) => {
+const CreateChannel = ({ onClose }) => {
   const [channelName, setChannelName] = useState('');
   const [error, setError] = useState('');
   const dispatch = useDispatch();
@@ -91,3 +91,5 @@ export const CreateChannel = ({ onClose }) => {
 CreateChannel.propTypes = {
     onClose: PropTypes.func.isRequired,
   };
+
+export default CreateChannel;

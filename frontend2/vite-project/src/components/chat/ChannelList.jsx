@@ -1,19 +1,21 @@
-// Updated ChannelList.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChannels, setCurrentChannel } from '../../features/channelSlice.js';
 import { PlusIcon } from 'lucide-react';
-import { CreateChannel } from './CreateChannel';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
+import CreateChannel from './CreateChannel';
 
 const ChannelList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { channels, currentChannel, isLoading } = useSelector((state) => state.channel);
   const { currentWorkspace } = useSelector((state) => state.workspace);
+  
   const [localChannels, setLocalChannels] = useState([]);
   const [pendingChannel, setPendingChannel] = useState(null);
   const [showCreateChannel, setShowCreateChannel] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (currentWorkspace) {
@@ -44,46 +46,66 @@ const ChannelList = () => {
     }
   }, [currentChannel, pendingChannel, navigate, currentWorkspace]);
 
-  if (!currentWorkspace) return <div>Select a workspace</div>;
-  if (isLoading) return <div>Loading channels...</div>;
+  const filteredChannels = localChannels.filter((channel) =>
+    channel.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (!currentWorkspace) return <div className="text-center text-gray-500">Select a workspace</div>;
+  if (isLoading) return <div className="text-center text-gray-500">Loading channels...</div>;
 
   return (
-    <div className="bg-gray-700 w-64 flex-shrink-0">
-      <div className="px-4 py-2 border-b border-gray-600">
-        <h2 className="text-white font-semibold">{currentWorkspace.name}</h2>
-      </div>
-
-      <div className="px-2 py-2">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-gray-400 text-sm">Channels</h3>
+    <div className="bg-gray-800 w-64 flex-shrink-0 h-full border-r border-gray-700">
+      <div className="px-4 py-4">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-gray-300 text-lg font-medium">Channels</h3>
           <button
             onClick={() => setShowCreateChannel(true)}
-            className="text-gray-400 hover:text-white p-1 rounded hover:bg-gray-600"
+            className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 focus:outline-none"
             title="Create Channel"
           >
-            <PlusIcon size={16} />
+            <PlusIcon size={20} />
           </button>
         </div>
-
         {localChannels.length === 0 ? (
-          <div className="text-gray-400">No channels available</div>
+          <div className="text-gray-500 text-sm">No channels available</div>
         ) : (
-          localChannels.map((channel) => (
-            <button
-              key={channel.id}
-              onClick={() => handleChannelClick(channel)}
-              className={`w-full text-left px-2 py-1 rounded ${
-                currentChannel?.id === channel.id
-                  ? 'bg-indigo-500 text-white'
-                  : 'text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              # {channel.name || 'may be error'}
-            </button>
-          ))
+          <Listbox onChange={handleChannelClick}>
+            <div className="relative">
+              <ListboxButton className="w-full px-4 py-2 text-left text-gray-300 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                {currentChannel ? `#${currentChannel.name}` : 'Select a channel'}
+              </ListboxButton>
+              <ListboxOptions className="absolute mt-2 w-full bg-gray-700 rounded-lg shadow-lg overflow-hidden">
+                <input
+                  type="text"
+                  placeholder="Search channels..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-2 text-white bg-gray-600 border-none rounded-t-lg focus:outline-none"
+                />
+                <div className="max-h-48 overflow-y-auto">
+                  {filteredChannels.length === 0 ? (
+                    <div className="px-4 py-2 text-gray-500">No channels found</div>
+                  ) : (
+                    filteredChannels.map((channel) => (
+                      <ListboxOption
+                        key={channel.id}
+                        value={channel}
+                        className={({ active }) =>
+                          `cursor-pointer px-4 py-2 ${
+                            active ? 'bg-gray-600 text-white' : 'text-gray-300'
+                          }`
+                        }
+                      >
+                        #{channel.name || 'Unnamed Channel'}
+                      </ListboxOption>
+                    ))
+                  )}
+                </div>
+              </ListboxOptions>
+            </div>
+          </Listbox>
         )}
       </div>
-
       {showCreateChannel && (
         <CreateChannel
           onClose={() => {
