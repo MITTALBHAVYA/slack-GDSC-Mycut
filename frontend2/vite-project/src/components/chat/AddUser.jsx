@@ -53,25 +53,24 @@ const AddUser = () => {
         } finally {
           setIsLoading(false);
         }
-      };
-      
+    };
 
     return (
         <div className="relative">
             {/* Trigger Button */}
             <button
                 onClick={() => setShowModal(true)}
-                className="px-4 py-2 bg-[#374151] hover:bg-[#6b7280] text-white rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 bg-[#374151] hover:bg-[#6b7280] text-white rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
             >
                 Add Members
             </button>
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 transition-opacity duration-300">
+                    <div className="bg-gray-900 text-white rounded-lg shadow-xl w-96 p-6">
                         {/* Modal Title */}
-                        <h2 className="text-lg font-semibold mb-4 text-gray-700">Add Members</h2>
+                        <h2 className="text-lg font-semibold mb-4 text-gray-100">Add Members</h2>
 
                         {/* Form */}
                         <form onSubmit={handleSubmit}>
@@ -79,7 +78,7 @@ const AddUser = () => {
                             <div className="mb-4">
                                 <label
                                     htmlFor="emailInput"
-                                    className="block text-sm font-medium text-gray-600 mb-2"
+                                    className="block text-sm font-medium text-gray-200 mb-2"
                                 >
                                     Enter Email
                                 </label>
@@ -88,12 +87,12 @@ const AddUser = () => {
                                     id="emailInput"
                                     value={emailInput}
                                     onChange={(e) => setEmailInput(e.target.value)}
-                                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 bg-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200"
                                 />
                                 <button
                                     type="button"
                                     onClick={handleAddEmail}
-                                    className="mt-2 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md text-sm"
+                                    className="mt-2 px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-sm text-white rounded-md transition duration-200"
                                 >
                                     Add Email
                                 </button>
@@ -105,13 +104,13 @@ const AddUser = () => {
                                     {emails.map((email, index) => (
                                         <li
                                             key={index}
-                                            className="flex items-center justify-between text-sm text-gray-700 py-1"
+                                            className="flex items-center justify-between text-sm text-gray-300 py-1"
                                         >
                                             <span>{email}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveEmail(email)}
-                                                className="text-red-500 hover:text-red-700 text-sm"
+                                                className="text-red-500 hover:text-red-700 text-sm transition duration-200"
                                             >
                                                 Remove
                                             </button>
@@ -120,24 +119,24 @@ const AddUser = () => {
                                 </ul>
                             )}
 
-                            {/* Error State */}
+                            {/* Error Message */}
                             {error && (
-                                <p className="text-sm text-red-500 mb-4">{error}</p>
+                                <p className="text-sm text-red-400 mb-4">{error}</p>
                             )}
 
-                            {/* Buttons */}
+                            {/* Action Buttons */}
                             <div className="flex justify-between mt-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-sm text-gray-700 rounded-md"
+                                    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-sm text-gray-200 rounded-md transition duration-200"
                                     disabled={isLoading}
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-sm text-white rounded-md ${
+                                    className={`px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-sm text-white rounded-md transition duration-200 ${
                                         isLoading ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
                                     disabled={isLoading}

@@ -5,8 +5,7 @@ import { useParams } from 'react-router-dom';
 
 const Sidebar = () => {
   const { currentWorkspace } = useSelector((state) => state.workspace);
-  const { workspaceId, channelId } = useParams();
-  console.log('workspaceIf now : ',workspaceId," channelId now :  ",channelId);
+  const { channelId } = useParams();
   return (
     <div className="bg-gray-800 text-white w-64 flex flex-col relative shadow-lg">
       {currentWorkspace ? (
@@ -19,8 +18,7 @@ const Sidebar = () => {
           </div>
           {channelId!=="greet" && (
             <div className="mt-4 p-2 border-t border-gray-600">
-              <h3 className="text-lg font-semibold">Users in Channel</h3>
-              <UserList workspaceId={workspaceId} channelId={channelId} />
+              <UserList/>
             </div>
           )}
         </div>

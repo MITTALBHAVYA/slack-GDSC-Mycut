@@ -57,7 +57,7 @@ const ChannelList = () => {
     <div className="bg-gray-800 w-64 flex-shrink-0 h-full border-r border-gray-700">
       <div className="px-4 py-4">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-gray-300 text-lg font-medium">Channels</h3>
+          <h3 className="text-gray-300 text-lg font-medium">Channels({channels.channels[0].length})</h3>
           <button
             onClick={() => setShowCreateChannel(true)}
             className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 focus:outline-none"

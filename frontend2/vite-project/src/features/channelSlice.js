@@ -35,8 +35,7 @@ export const fetchChannelMembers = createAsyncThunk(
     async ({workspaceId,channelId}, { rejectWithValue }) => {
         try {
             const response = await api.get(`/workspace/${workspaceId}/channel/${channelId}/`);
-            console.log("here is the fetch channel memeners : ",response.data.data);
-            return response.data.data; // Assuming this returns the list of members
+            return response.data.data; 
         } catch (error) {
             return rejectWithValue(error.response.data);
         }
