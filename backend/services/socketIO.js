@@ -32,11 +32,12 @@ export default function initSocketIO(server){
 
         socket.on('sendMessage',async(messageData)=>{
             try{
-                const {channelId,message,userId} = messageData;
+                const {channelId,message,userId,username} = messageData;
                 const newMessage = await Message.create({
                     message : message,
                     channel_id : channelId,
                     user_id : userId,
+                    username : username,
                     timestamp : new Date(),
                 });
                 io.to(channelId).emit('newMessage',newMessage);

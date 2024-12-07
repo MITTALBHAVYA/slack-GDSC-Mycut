@@ -10,7 +10,8 @@ export const sendMessage = catchAsyncErrors(async(req,res,next)=>{
    const message = await Message.create({
     message : content,
     channel_id : channelId,
-    user_id : req.user.id
+    user_id : req.user.id,
+    username: req.user.username,
    });
 
    if(!message){

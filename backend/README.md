@@ -70,8 +70,8 @@ backend/
 │   ├── userRoutes.js
 │   └── workspaceRoutes.js
 ├── services/
-│   ├── EmailService.js         # Email functionality
-│   ├── googleAuthServices.js   # Google OAuth
+│   ├── EmailService.js         #email services
+|   ├── socketIO.js             #socketIO services
 │   └── jwtServices.js          # JWT operations
 └── server.js                   # Application entry point
 ```

@@ -7,6 +7,7 @@ export const fetchMessages = createAsyncThunk(
     async ({workspaceId,channelId},{rejectWithValue})=>{
         try{
             const response = await api.get(`/workspace/${workspaceId}/channel/${channelId}/messages`);
+            console.log("response.data ",response.data);
             return response.data.messages;
         }catch(error){
             return rejectWithValue(error.response?.data || {message : 'Failed to fetch messages'});
