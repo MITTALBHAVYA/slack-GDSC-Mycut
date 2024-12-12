@@ -54,7 +54,7 @@ const ChannelList = () => {
   if (isLoading) return <div className="text-center text-gray-500">Loading channels...</div>;
 
   return (
-    <div className="bg-gray-800 w-64 flex-shrink-0 h-full border-r border-gray-700">
+    <div className="bg-gray-800 w-full flex-shrink-0 h-full border-r border-gray-700">
       <div className="px-4 py-4">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-gray-300 text-lg font-medium">Channels({channels.channels[0].length})</h3>

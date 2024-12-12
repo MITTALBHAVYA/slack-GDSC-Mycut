@@ -4,31 +4,35 @@ import { store } from '../app/store';
 import { logout } from '../features/authSlice';
 
 const api = axios.create({
-    baseURL:'http://localhost:3000/api/v1',
-    withCredentials:true,
-    headers:{
-        "Access-Control-Allow-Origin":"*",
-        "Content-Type":"application/json",
+    baseURL: 'http://localhost:3000/api/v1',
+    withCredentials: true,
+    headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json", // Default for JSON
     }
 });
 
 api.interceptors.request.use(
-    (config)=>{
+    (config) => {
         const token = localStorage.getItem('token');
-        if(token){
-            config.headers.Authorization=`Bearer ${token}`;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
+        if (config.data instanceof FormData) {
+            delete config.headers['Content-Type'];
+        }
+
         return config;
     },
-    (error)=>{
+    (error) => {
         return Promise.reject(error);
     }
 );
 
 api.interceptors.response.use(
-    (response)=>response,
-    async(error)=>{
-        if(error.response?.status === 401){
+    (response) => response,
+    async (error) => {
+        if (error.response?.status === 401) {
             store.dispatch(logout());
             localStorage.removeItem('token');
             window.dispatchEvent(new CustomEvent('authError'));

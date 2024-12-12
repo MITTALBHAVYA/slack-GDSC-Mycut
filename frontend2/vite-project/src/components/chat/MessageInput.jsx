@@ -1,17 +1,24 @@
 import { useState } from 'react';
-import {useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import useSocket from '../../hooks/useSocket.js';
 import { FiSend, FiVideo, FiPhone, FiPaperclip } from 'react-icons/fi';
-import { useParams } from 'react-router-dom';
 
 const MessageInput = () => {
   const [message, setMessage] = useState('');
+  const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const { socket, sendMessage } = useSocket();
   const userId = useSelector((state) => state.auth.user?.id);
   const username = useSelector((state) => state.auth.user?.username);
-  const{channelId} = useParams();
+  const { channelId } = useParams();
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +33,25 @@ const MessageInput = () => {
         username,
         timestamp: new Date().toISOString(),
       };
-      sendMessage(newMessage);
+      if (file) {
+        console.log('file :', file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          const fileData = reader.result.split(',')[1];
+          newMessage.file = {
+            data: fileData,
+            name: file.name,
+            mimetype: file.type,
+          };
+          sendMessage(newMessage);
+        };
+        reader.readAsDataURL(file);
+      }
+      else {
+        sendMessage(newMessage);
+      }
       setMessage('');
+      setFile(null);
     } catch (error) {
       console.error('Failed to send message:', error);
     } finally {
@@ -52,13 +76,13 @@ const MessageInput = () => {
         >
           <FiPhone size={20} />
         </button>
-        <button
-          type="button"
-          className="p-2 text-gray-500 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        <label
+          className="p-2 text-gray-500 hover:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
           title="Upload File"
         >
           <FiPaperclip size={20} />
-        </button>
+          <input type="file" onChange={handleFileChange} className='hidden' disabled={isLoading || !socket} />
+        </label>
         <input
           type="text"
           value={message}
@@ -69,7 +93,7 @@ const MessageInput = () => {
         />
         <button
           type="submit"
-          disabled={isLoading || !message.trim() || !socket}
+          disabled={isLoading || (!message.trim() && !file) || !socket}
           className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-indigo-400"
         >
           <FiSend size={20} className="mr-1" />
@@ -78,10 +102,6 @@ const MessageInput = () => {
       </form>
     </div>
   );
-};
-
-MessageInput.propTypes = {
-  channelId: PropTypes.string.isRequired, // channelId must be a string and is required
 };
 
 export default MessageInput;

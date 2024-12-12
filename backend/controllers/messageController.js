@@ -28,8 +28,7 @@ export const getChannelMessages = catchAsyncErrors(async(req,res,next)=>{
    const {channelId} = req.params;
 
    const messages = await Message.find({channel_id:channelId})
-   .sort({timestamp:-1})
-   .limit(50);
+   .sort({timestamp:1})
 
    res.status(200).json({
       success: true,

@@ -223,6 +223,7 @@ erDiagram
     Message {
         uuid id PK
         string content
+        string username
         uuid channel_id FK
         uuid user_id FK
         boolean edited

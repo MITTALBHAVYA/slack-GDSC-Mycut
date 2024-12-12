@@ -20,7 +20,7 @@ const useSocket = () =>{
                 dispatch(addMessage(message));
             });
             socketRef.current.on('error',(error)=>{
-                console.error('Socket error: ',error);
+                console.error('from useSocket error: ',error);
             });
             return ()=>{
                 if(socketRef.current){

@@ -9,7 +9,7 @@ const Sidebar = () => {
   return (
     <div className="bg-gray-800 text-white w-64 flex flex-col relative shadow-lg">
       {currentWorkspace ? (
-        <div className="flex-3 overflow-y-auto hide-scrollbar">
+        <div className="flex-3 hide-scrollbar">
           <div className="border-b border-gray-600 p-4">
             <h2 className="text-xl font-bold">{currentWorkspace.name}</h2>
           </div>
