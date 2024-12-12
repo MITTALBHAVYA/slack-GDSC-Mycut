@@ -1,7 +1,7 @@
 
 ---
 
-# Chat Application Backend
+# GDSC SLACK Backend
 
 ## Table of Contents
 - [Overview](#overview)
@@ -46,6 +46,7 @@ backend/
 │   ├── authController.js       # Authentication logic
 │   ├── channelController.js    # Channel management
 │   ├── messageController.js    # Message handling
+│   ├── userChannelRelationController.js # User-Channel management
 │   ├── userController.js       # User operations
 │   └── workspaceController.js  # Workspace management
 ├── middleware/
@@ -68,12 +69,15 @@ backend/
 │   ├── channelRoutes.js
 │   ├── messageRoutes.js
 │   ├── userRoutes.js
+│   ├── userChannelRelationRoutes.js
 │   └── workspaceRoutes.js
 ├── services/
+│   ├── cloudinaryServices.js   #cloudinaryServices 
 │   ├── EmailService.js         #email services
 |   ├── socketIO.js             #socketIO services
 │   └── jwtServices.js          # JWT operations
 └── server.js                   # Application entry point
+└── .env.example                # Environment variable example                
 ```
 
 ## Prerequisites
@@ -228,6 +232,7 @@ erDiagram
         uuid user_id FK
         boolean edited
         timestamp created_at
+        arrayOfObject attachments
     }
 
     UserPreferences {
