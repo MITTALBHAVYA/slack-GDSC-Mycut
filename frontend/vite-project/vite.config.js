@@ -17,12 +17,14 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        // eslint-disable-next-line no-undef
+        target: process.env.VITE_API_URL,
         changeOrigin: true,
         secure: false,
       },
       '/socket.io': {
-        target: 'http://localhost:3000',
+        // eslint-disable-next-line no-undef
+        target: process.env.VITE_API_URL,
         changeOrigin: true,
         ws: true,
       },
