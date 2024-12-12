@@ -1,128 +1,174 @@
-# GDSC Slack App
+# 💬 GDSC SLACK: Your Ultimate Collaborative Communication Platform
+![GDSC SLACK LOGO ](/frontend/vite-project/public/images/logo.png)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/MITTALBHAVYA/slack-GDSC-Mycut)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## Overview
+## 🚀 Project Overview
 
-The GDSC Slack App is a web application built using React for the frontend and a backend of your choice. This app aims to provide a seamless integration with Slack, allowing users to interact with Slack functionalities through a user-friendly web interface.
+**GDSC SLACK** is a cutting-edge, feature-rich collaborative chat application designed to revolutionize team communication. Built with modern technologies, it offers seamless, secure, and intuitive messaging experiences across workspaces and channels.
 
-## Features
+## 🖼️ Screenshots
 
-- **Landing Page**: Introduction and overview of the app.
-- **Sign In**: Users can sign in using their Slack credentials.
-- **Sign Up**: New users can register for the app.
+### Landing Page
+![Landing Page](/frontend/vite-project/public/images/Landing_Page.png)
 
-## Tech Stack
+### SIGNIN Page
+![Login Page](/frontend/vite-project/public/images/SignIn_Page.png)
 
-- **Frontend**: React, Axios
-- **Backend**: Node.js with Express
-- **Authentication**: OAuth 2.0 for Slack
+### Sign Up Page
+![Sign Up Page](/frontend/vite-project/public/images/SignUp_Page.png)
 
-## Installation
+### Workspace Page
+![Workspace Page](/frontend/vite-project/public/images/Workspace_Page.png)
 
-### Prerequisites
+### Chat Page
+![Chat Page](/frontend/vite-project/public/images/Chat_Page.png)
 
-- Node.js
-- npm (or yarn)
-- Slack API credentials (Client ID, Client Secret, etc.)
+## ✨ Key Features
 
-### Frontend Setup
+### 🔐 Robust Authentication
+- Secure login with JWT and Google OAuth
+- Multi-factor authentication support
+- Role-based access control
 
-1. Clone the repository:
-   ```bash
-   git clone repoURL
-   cd gdsc-slack-app
-   ```
+### 🌐 Workspace Management
+- Create and manage multiple workspaces
+- Flexible channel organization
+- Granular user role assignments
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+### 💬 Advanced Messaging
+- Real-time chat capabilities
+- Message editing and deletion
+- File and media attachments
+- Reactions and thread support
 
-3. Create a `.env` file in the root directory and add your backend URL:
-   ```env
-   REACT_APP_API_BASE_URL=http://your-backend-url/api
-   ```
+### 🎨 Personalization
+- Custom user themes
+- Timezone and notification preferences
+- Responsive design for desktop and mobile
 
-4. Start the frontend server:
-   ```bash
-   npm start
-   ```
+## 🛠 Tech Stack
+
+### Backend Powerhouse
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
+
+### Frontend Ecosystem
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Redux](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+
+## 🚦 Quick Start
 
 ### Backend Setup
+```bash
+# Clone the repository
+git clone https://github.com/MITTALBHAVYA/slack-GDSC-Mycut
 
-1. Navigate to the backend directory (if it's a separate folder):
-   ```bash
-   cd backend
-   ```
+# Navigate to backend directory
+cd backend
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-3. Create a `.env` file in the backend directory and add your Slack API credentials:
-   ```env
-   SLACK_CLIENT_ID=your-slack-client-id
-   SLACK_CLIENT_SECRET=your-slack-client-secret
-   ```
+# Set up environment variables
+cp .env.example .env
 
-4. Start the backend server:
-   ```bash
-   npm start
-   ```
-
-## Usage
-
-- Open your browser and navigate to `http://localhost:3000` to access the app.
-- Use the Sign In and Sign Up pages to interact with the Slack app.
-
-## Project Structure
-
-```
-gdsc-slack-app/
-├── public/
-├── src/
-│   ├── components/
-│   │   ├── LandingPage.jsx
-│   │   ├── SignInPage.jsx
-│   │   └── SignUpPage.jsx
-│   ├── App.jsx
-│   ├── index.js
-│   └── ...
-├── backend/
-│   ├── routes/
-│   │   ├── auth.js
-│   │   └── ...
-│   ├── server.js
-│   ├── .env
-│   └── ...
-├── .env
-├── package.json
-├── README.md
-└── ...
+# Start the server
+npm start
 ```
 
-## Contributing
+### Frontend Setup
+```bash
+# Navigate to frontend directory
+cd frontend
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
+# Install dependencies
+npm install
 
-![alt text](<Landing Page.jpg>)
-![alt text](<Sign-in page.jpg>)
-![alt text](<Desktop - 5.jpg>)
-![alt text](<Desktop - 4.jpg>)
-![alt text](<Server page.jpg>)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Google Developer Student Clubs (GDSC)
-- Slack API documentation
-
+# Start development server
+npm start
 ```
+
+## 🧪 Testing
+
+### Backend Testing
+- Comprehensive test suite with Jest and Supertest
+- Postman collection for API testing
+
+```bash
+# Run backend tests
+npm run test
+```
+
+### Frontend Testing
+- Component and integration tests with Jest
+- React Testing Library for thorough coverage
+
+```bash
+# Run frontend tests
+npm test
+```
+
+## 🔮 Roadmap and Future Updates
+
+- [ ] Real-time typing indicators
+- [ ] Voice and video calling integration
+- [ ] Advanced message search functionality
+- [ ] Enhanced role and permission management
+- [ ] Comprehensive analytics dashboard
+
+## 🤝 Contributing to GDSC SLACK
+
+We warmly welcome contributions from the open-source community! Here's how you can help:
+
+1. 🍴 **Fork the Repository**
+   - Create your own copy of the project
+
+2. 🌿 **Create a Feature Branch**
+   ```bash
+   git checkout -b feature/amazing-contribution
+   ```
+
+3. 🔧 **Make Your Changes**
+   - Implement your feature or bug fix
+   - Ensure code quality and test coverage
+
+4. 📤 **Submit a Pull Request**
+   - Describe your changes in detail
+   - Link any related issues
+
+### 🌟 Star Us on GitHub!
+
+Like what you see? Show your support by starring our repository! ⭐
+
+[![GitHub stars](https://img.shields.io/github/stars/MITTALBHAVYA/GDSC-SLACK.svg?style=social&label=Star)](https://github.com/MITTALBHAVYA/slack-GDSC-Mycut)
+
+By starring the project, you:
+- Help increase project visibility
+- Motivate maintainers
+- Become part of our growing community
+
+### 💡 Ways to Contribute
+- Report bugs
+- Suggest features
+- Improve documentation
+- Write code
+- Share with your network
+
+## 📄 License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+## 👨‍💻 Author
+
+**Bhavya Mittal**
+- GitHub: [@MITTALBHAVYA](https://github.com/MITTALBHAVYA)
+
+---
+
+**Happy Collaborating!** 🎉

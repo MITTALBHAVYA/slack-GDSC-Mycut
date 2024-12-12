@@ -1,9 +1,7 @@
-1.ChatPage
-  |=> fixed fetchmessages 
-  |=>.
-frontend2
+frontend
 |-node_modules
 |-public
+| |-images
 |-src
 | |-api
 | | |-axios.js
@@ -14,6 +12,7 @@ frontend2
 | |-components
 | | |-auth
 | | | |-ForgotPassword.jsx
+| | | |-ResetPassword.jsx
 | | | |-Login.jsx
 | | | |-PrivateRoute.jsx
 | | | |-Register.jsx
@@ -22,12 +21,24 @@ frontend2
 | | | |-MessageInput.jsx
 | | | |-MessageList.jsx
 | | | |-UserList.jsx
+| | | |-AddUser.jsx
+| | | |-CreateChannel.jsx
 | | |-layout
 | | | |-ChatLayout.jsx
 | | | |-Header.jsx
 | | | |-Sidebar.jsx
+| | | |-Navbar.jsx
+| | | |-PageLayout.jsx
+| | |-SpaceRobot
+| | | |-SpaceRobot2.jsx
+| | |-ui
+| | | |-FileIcon.jsx
+| | | |-Logo.jsx
+| | | |-UserProfilePopUp.jsx
 | | |-workspace
 | | | |-CreateWorkspace.jsx
+| | | |-CreateWorkspace2.jsx
+| | | |-WorkspaceList2.jsx
 | | | |-WorkspaceList.jsx
 | | |-features
 | | | |-authSlice.js
@@ -41,9 +52,16 @@ frontend2
 | | | |-ChatPage.jsx
 | | | |-NotFound.jsx
 | | | |-WorkspacePage.jsx
+| | | |-LandingPage.jsx
+| | |-services
+| | | |-GoogleLogin.js
 | | |-App.jsx
 | | |-main.jsx
-
+|-.env
+|-package-lock.json
+|-package.json
+|-postcss.config.js
+|-vite.config.js
 // axios.js
 import axios from 'axios';
 const api = axios.create({

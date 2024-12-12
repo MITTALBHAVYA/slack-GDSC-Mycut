@@ -7,6 +7,7 @@ import Navbar from '../layout/Navbar.jsx';
 import { MdOutlineMailOutline } from "react-icons/md";
 import SpaceRobot2 from '../SpaceRobot/SpaceRobot2.jsx';
 import PageLayout from '../layout/PageLayout.jsx';
+import { loginWithGoogle } from "../../services/GoogleLogin.js";
 import { MdErrorOutline } from 'react-icons/md';
 
 
@@ -44,14 +45,7 @@ const Login = () => {
       console.error('Login failed:', err);
     }
   };
-
-  const loginWithGoogle = () => {
-    const VITE_API_URL = import.meta.env.VITE_API_URL;
-    window.open(`${VITE_API_URL}/auth/google/callback`, "_self");
-  };
   
-  
-
   return (
     <PageLayout>
       <div className="flex justify-end items-start w-full h-full">

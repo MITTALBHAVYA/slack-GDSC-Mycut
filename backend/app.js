@@ -17,7 +17,6 @@ import { Strategy as OAuth2Strategy } from 'passport-google-oauth20';
 import User from './models/userModel.js';
 import JwtService from './services/jwtServices.js';
 import { UserPreferences } from './models/userPreferencesModel.js';
-// import passport from "./config/passport.js";
 import './models/index.js';
 
 dotenv.config();

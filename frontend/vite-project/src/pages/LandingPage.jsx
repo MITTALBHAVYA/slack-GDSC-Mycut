@@ -1,16 +1,13 @@
 import PageLayout from "../components/layout/PageLayout.jsx";
 import Navbar from "../components/layout/Navbar.jsx";
 import SpaceRobot2 from "../components/SpaceRobot/SpaceRobot2.jsx";
+import { loginWithGoogle } from "../services/GoogleLogin.js";
 import { useNavigate } from "react-router-dom";
 const LandingPage = () => {
   const navigate = useNavigate();
 
   const handleEmailSignup = ()=>{
     navigate('/auth/register');
-  }
-  const loginWithGoogle = () => {
-    const VITE_API_URL = import.meta.env.VITE_API_URL;
-    window.open(`${VITE_API_URL}/auth/google/callback`, "_self");
   }
   return (
     <PageLayout>
