@@ -1,5 +1,5 @@
 # 💬 GDSC SLACK: Your Ultimate Collaborative Communication Platform
-![GDSC SLACK LOGO ](/frontend/vite-project/public/images/logo.png)
+![GDSC SLACK LOGO ](/frontend/public/images/logo.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/MITTALBHAVYA/slack-GDSC-Mycut)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -11,19 +11,19 @@
 ## 🖼️ Screenshots
 
 ### Landing Page
-![Landing Page](/frontend/vite-project/public/images/Landing_Page.png)
+![Landing Page](/frontend/public/images/Landing_Page.png)
 
 ### SIGNIN Page
-![Login Page](/frontend/vite-project/public/images/SignIn_Page.png)
+![Login Page](/frontend/public/images/SignIn_Page.png)
 
 ### Sign Up Page
-![Sign Up Page](/frontend/vite-project/public/images/SignUp_Page.png)
+![Sign Up Page](/frontend/public/images/SignUp_Page.png)
 
 ### Workspace Page
-![Workspace Page](/frontend/vite-project/public/images/Workspace_Page.png)
+![Workspace Page](/frontend/public/images/Workspace_Page.png)
 
 ### Chat Page
-![Chat Page](/frontend/vite-project/public/images/Chat_Page.png)
+![Chat Page](/frontend/public/images/Chat_Page.png)
 
 ## ✨ Key Features
 
