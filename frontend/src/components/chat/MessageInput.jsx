@@ -1,14 +1,15 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import useSocket from '../../hooks/useSocket.js';
+// import useSocket from '../../hooks/useSocket.js';
 import { FiSend, FiVideo, FiPhone, FiPaperclip } from 'react-icons/fi';
 
-const MessageInput = () => {
+const MessageInput = ({sendMessage}) => {
   const [message, setMessage] = useState('');
   const [file, setFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { socket, sendMessage } = useSocket();
+  // const { sendMessage } = useSocket();
   const userId = useSelector((state) => state.auth.user?.id);
   const username = useSelector((state) => state.auth.user?.username);
   const { channelId } = useParams();
@@ -81,7 +82,7 @@ const MessageInput = () => {
           title="Upload File"
         >
           <FiPaperclip size={20} />
-          <input type="file" onChange={handleFileChange} className='hidden' disabled={isLoading || !socket} />
+          <input type="file" onChange={handleFileChange} className='hidden' disabled={isLoading} />
         </label>
         <input
           type="text"
@@ -89,11 +90,11 @@ const MessageInput = () => {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
           className="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          disabled={isLoading || !socket}
+          disabled={isLoading }
         />
         <button
           type="submit"
-          disabled={isLoading || (!message.trim() && !file) || !socket}
+          disabled={isLoading || (!message.trim() && !file)}
           className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-indigo-400"
         >
           <FiSend size={20} className="mr-1" />
@@ -102,6 +103,9 @@ const MessageInput = () => {
       </form>
     </div>
   );
+};
+MessageInput.propTypes = {
+  sendMessage: PropTypes.func.isRequired,
 };
 
 export default MessageInput;

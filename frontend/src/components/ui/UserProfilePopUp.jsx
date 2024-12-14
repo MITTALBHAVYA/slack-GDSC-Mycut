@@ -11,6 +11,7 @@ const UserProfilePopup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
+  console.log(user);
   const {username,email} = user;
   const handleLogout = () => {
     if (window.confirm('Are you sure you want to logout?')) {

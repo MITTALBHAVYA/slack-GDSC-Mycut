@@ -25,7 +25,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, "https://accounts.google.com"],
+    // origin: [process.env.FRONTEND_URL, "https://accounts.google.com"],
+    origin:true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
