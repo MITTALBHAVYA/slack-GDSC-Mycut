@@ -242,7 +242,8 @@ erDiagram
         string timezone
     }
 ```
-
+## Schema Flow version1
+![schemaflow](schemamodel.drawio.png)
 ## Testing
 A Postman collection is available to simplify API testing. Download the collection [here](/gdscSlack.postman_collection.json) and import it into Postman to test various endpoints.
 
