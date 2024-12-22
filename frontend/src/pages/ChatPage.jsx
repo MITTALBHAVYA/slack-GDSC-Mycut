@@ -6,7 +6,7 @@ import Sidebar from '../components/layout/Sidebar';
 import MessageList from '../components/chat/MessageList';
 import MessageInput from '../components/chat/MessageInput';
 import useSocket from '../hooks/useSocket.js';
-import { useDispatch } from 'react-redux';
+import { useDispatch,useSelector } from 'react-redux';
 import { fetchChannelMembers } from '../features/channelSlice.js';
 
 const SPECIAL_CHANNELS = {
@@ -17,7 +17,8 @@ const ChatPage = () => {
   const dispatch = useDispatch();
   const { workspaceId, channelId } = useParams();
   const navigate = useNavigate();
-  const { joinChannel } = useSocket();
+  const socket = useSocket();
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (!workspaceId || !channelId) {
@@ -26,10 +27,10 @@ const ChatPage = () => {
     }
     
     if (channelId !== SPECIAL_CHANNELS.GREET) {
-      joinChannel(channelId);
+      socket.joinChannel(channelId,user.id);
       dispatch(fetchChannelMembers({ workspaceId, channelId }));
     }
-  }, [channelId, joinChannel, navigate, workspaceId,dispatch]);
+  }, [channelId, navigate, workspaceId, dispatch, socket, user.id]);
 
   if (!workspaceId || !channelId) {
     return (
@@ -53,9 +54,9 @@ const ChatPage = () => {
         ) : (
             <main className="flex-1 flex flex-col">
               <div className="flex-1 overflow-y-auto">
-                <MessageList workspaceId={workspaceId} channelId={channelId} />
+                <MessageList />
               </div>
-              <MessageInput channelId={channelId}/>
+              <MessageInput sendMessage={socket.sendMessage}/>
             </main>
         )}
       </div>

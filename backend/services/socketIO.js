@@ -6,7 +6,8 @@ import { uploadToCloudinary, determineFileType } from './cloudinaryServices.js';
 export default function initSocketIO(server) {
     const io = new SocketIOServer(server, {
         cors: {
-            origin: process.env.FRONTEND_URL,
+            // origin: process.env.FRONTEND_URL,
+            origin: "http://192.168.31.40:5173",
             methods: ['GET', 'POST'],
         },
         maxHttpBufferSize: 10 * 1024 * 1024, // 10 MB buffer size
@@ -26,12 +27,12 @@ export default function initSocketIO(server) {
 
     // Socket events
     io.on('connection', (socket) => {
-        console.log('A user connected: ', socket.id);
+        console.log('A user connected through socket id => ', socket.id);
 
         // Join room event
-        socket.on('joinRoom', (channelId) => {
+        socket.on('joinRoom', (channelId,userId) => {
             socket.join(channelId);
-            console.log(`User ${socket.id} joined room ${channelId}`);
+            console.log(`User ${userId} joined room ${channelId} through socket id => ${socket.id}`);
         });
 
         // Send message event

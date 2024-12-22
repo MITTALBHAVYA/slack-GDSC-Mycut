@@ -1,14 +1,14 @@
 import { useEffect, useRef, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMessage, fetchMessages } from '../../features/messageSlice.js';
-import useSocket from '../../hooks/useSocket.js';
+import { fetchMessages } from '../../features/messageSlice.js';
+// import useSocket from '../../hooks/useSocket.js';
 import { useParams } from 'react-router-dom';
 
 const MessageList = () => {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
   const messageListRef = useRef(null);
-  const { socket } = useSocket();
+  // const { socket } = useSocket();
   const { messages, isLoading, error } = useSelector((state) => state.message);
   const { workspaceId, channelId } = useParams();
   const user = useSelector((state) => state.auth.user);
@@ -37,18 +37,18 @@ const MessageList = () => {
   }, [sortedMessages]);
 
   // Socket listener for new messages
-  useEffect(() => {
-    if (socket) {
-      const handleNewMessage = (message) => {
-        dispatch(addMessage(message));
-      };
+  // useEffect(() => {
+  //   if (socket) {
+  //     const handleNewMessage = (message) => {
+  //       dispatch(addMessage(message));
+  //     };
 
-      socket.on('newMessage', handleNewMessage);
-      return () => {
-        socket.off('newMessage', handleNewMessage);
-      };
-    }
-  }, [socket, dispatch]);
+  //     socket.on('newMessage', handleNewMessage);
+  //     return () => {
+  //       socket.off('newMessage', handleNewMessage);
+  //     };
+  //   }
+  // }, [socket, dispatch]);
 
   // Render loading state
   if (!channelId) return (
