@@ -6,8 +6,8 @@ import { uploadToCloudinary, determineFileType } from './cloudinaryServices.js';
 export default function initSocketIO(server) {
     const io = new SocketIOServer(server, {
         cors: {
-            // origin: process.env.FRONTEND_URL,
-            origin: "http://192.168.31.40:5173",
+            origin: process.env.FRONTEND_URL,
+            // origin: "http://192.168.31.40:5173",
             methods: ['GET', 'POST'],
         },
         maxHttpBufferSize: 10 * 1024 * 1024, // 10 MB buffer size
