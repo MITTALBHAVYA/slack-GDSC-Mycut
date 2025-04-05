@@ -1,16 +1,28 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/images/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GDSC SLACK</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
-    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://www.google.com https://accounts.google.com">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/images/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GDSC SLACK</title>
+
+  <!-- ✅ Google Fonts -->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+
+  <!-- ✅ CSP: Allow scripts from necessary sources -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src *; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' https://sdk.videosdk.live https://unpkg.com https://accounts.google.com;" />
+
+  <!-- ✅ Latest UMD browser-compatible VideoSDK script -->
+  <script src="https://sdk.videosdk.live/rtc-js-prebuilt/0.3.33/rtc-js-prebuilt.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>

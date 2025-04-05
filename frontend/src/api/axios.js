@@ -4,12 +4,14 @@ import { store } from '../app/store';
 import { logout } from '../features/authSlice';
 
 const api = axios.create({
-    baseURL: `${import.meta.env.VITE_API_URL}/api/v1`,
-    withCredentials: true,
-    headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json", // Default for JSON
-    }
+  baseURL: import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api/v1`
+    : "http://localhost:3000/api/v1",
+  withCredentials: true,
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Content-Type": "application/json", // Default for JSON
+  },
 });
 
 api.interceptors.request.use(
